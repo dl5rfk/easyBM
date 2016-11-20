@@ -1,0 +1,133 @@
+<?php
+/**
+ * THE EASYMB WEB CONTROL
+ *
+ * Use this code for a easyBM Setup
+ *
+ * @file       /var/www/html/admin/index.php
+ * @author     DL5RFK <easybm@dl5rfk.org>
+ * @copyright  2016 The German BrandMeister Team
+ * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
+ * @version    2016-09-30
+ * @remarks    WITHOUT ANY WARRANTY OR GUARANTEE
+ * @see        http://www.bm262.de
+ *
+ */
+
+include_once("head.php");
+
+function getInitialPassword($length) {
+   //Mögliche Zeichen für den String
+   $zeichen = '0123456789';
+   $zeichen .= 'abcdefghijklmnopqrstuvwxyz';
+   $zeichen .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+   $zeichen .= '()!.:=$';
+ 
+   //String wird generiert
+   $str = '';
+   $anz = strlen($zeichen);
+   for ($i=0; $i<$length; $i++) {
+      $str .= $zeichen[rand(0,$anz-1)];
+   }
+   return $str;
+}
+
+$passwd="";
+$passwdchgd=false;
+$password = $_POST['password'];
+
+#check if POSTpassword is not empty then load config and verify Adminpassword
+if (!empty($password)){
+	include_once("config.php");
+	$cfgpasswd = ADMINPASSWORD;
+	$cfgpasswdchgd = ADMINPASSWORDCHANGED;
+	if ($cfgpasswd === $password) {
+		$_SESSION['angemeldet'] = true;
+		$_SESSION['loginutime'] = time();
+		if ($passwdchgd) {
+?>
+		<div class="container">
+		<div class="jumbotron">
+		  <h1>easyBM <small>Web Control Center</small></h1>
+		  <div class="alert alert-success">Login successfull! <br />Please, have a look at the <a href="status.php">status page</a>, thank's.</p></div>
+		</div>
+		</div>
+
+	<?php } else { ?>
+			//PASSWD CHANGE by changepasswd.php BECAUSE $passwdchgd IS FALSE 
+			<div class="container">
+			<div class="jumbotron">
+			  <h1>easyBM <small>Web Control Center</small></h1>
+			  <p>Please change your password:</p>
+			  <div class="row">
+			  <div class="col-lg-6">
+			    <div class="input-group">
+			      <form action="changepasswd.php" method="post">
+			      <input name="password" type="password" class="form-control" placeholder="new password">
+			      <input name="password2" type="password" class="form-control" placeholder="repeat new password">
+			      <span class="input-group-btn">
+			        <button class="btn btn-default" type="submit">Change password</button>
+			      </form>
+			      </span>
+			    </div><!-- /input-group -->
+			  </div><!-- /.col-lg-6 -->
+			</div><!-- /.row -->
+			</div><!-- /.jumbotron -->
+			</div><!-- /.container -->
+<?php
+   		   }
+	} else {
+?>
+		<! -- Login Failed, wrong password -->
+		<div class="container">
+		<div class="jumbotron">
+		  <h1>easyBM <small>Web Control Center</small></h1>
+		  <div class="alert alert-danger">Login failed, please try again! &nbsp;<a href="/admin/index.php" class="btn btn-success">Login now!</a></div>
+		</div>
+		</div>
+<?php
+	}
+} else {
+	if (!file_exists ("config.php") ) {
+		$passwd = getInitialPassword(10);
+		$configfile = fopen("config.php", 'w');
+		fwrite($configfile,"<?php\n");
+		fwrite($configfile,"# This is an auto-generated config-file!\n");
+		fwrite($configfile,"# Be careful, when manual editing this!\n\n");
+		fwrite($configfile,"define(\"ADMINPASSWORD\", \"$passwd\");"."\n");
+		fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", FALSE);"."\n");
+		fwrite($configfile,"?>\n");
+		fclose($configfile);
+	} else {
+		include("config.php");
+		$passwd = ADMINPASSWORD;
+		$passwdchgd = ADMINPASSWORDCHANGED;
+	}
+?>
+<div class="container">
+<div class="jumbotron">
+  <h1>easyBM <small>Web Control Center</small></h1>
+  <p>A user web interface for digital voice communication in amateur radio.</p>
+<?php
+	if (!$passwdchgd) {
+?>
+  <p>It seems to be the first time you start easyBM. Please use the following password for logging into the system: <strong><?php echo $passwd; ?></strong></p>
+<?php  } else { echo '<p>Please logging into the system:</p>'; } ?>
+  <div class="row">
+  <div class="col-lg-6">
+    <div class="input-group">
+      <form class="form-inline" action="admin.php" method="post">    
+		<input name="password" type="password" class="form-control" placeholder="password">
+		<br />
+		<button class="btn btn-default" type="submit">Login</button>
+      </form>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+</div>
+</div>
+<?php
+}
+
+include_once("footer.php");
+?>

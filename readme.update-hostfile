@@ -1,0 +1,68 @@
+
+I'm using a DVAP with Dstar Commander. How do I get the ircddbgateway to link to a specified XLX reflector ? Is there a hosts file that needs to be appended ?
+
+
+If you're running ircDDBGateway, you will need to add the XLX reflectors to its hosts files.  I have developed a script that replaces the "klxreflectors" script found on the Maryland D-STAR R-Pi image.  There is a second script that merges the XLX reflector data with the standard files.  I'm not sure how your setup maintains its hosts files, but I added these lines to mine after the normal updates were downloaded for the Maryland D-STAR distribution.  You'd need to work these into your setup - may require path and/or filename tweaks.  The additions to your update script must come after the normal hosts files are downloaded, but before ircDDBGateway is restarted.  
+
+The scripts prioritise entries from your existing files over those from the XLX source, to prevent duplicate entries.  There are two reasons duplicate entries can happen:
+
+1.  The XLX reflector owner submitted their details for inclusion in the official hosts file.  This is of no concern, the de-duping feature of my scripts will prevent any problems, provided the official entry is up to date,
+
+2.  Someone has registered an XLX reflector ID that conflicts with IDs from the existing hosts file.  This is the reason I chose to make the manually registered reflector ID the one with precedence, so people who don't do their homework don't adversely affect pre-existing reflectors.
+
+===========================================
+wget -O /tmp/xlx_Hosts.txt http://xlxapi.rlx.lu/api.php?do=GetReflectorHostname
+
+XLXFILE=/tmp/xlx_Hosts.txt
+echo "Merging XLX DPlus reflectors with master list..."
+export HOSTFILE=/tmp/DPlus_Hosts.txt
+export REFTYPE="REF"
+cat $XLXFILE | xargs -r -l1 /usr/local/bin/checkref
+
+echo "Merging  XLX DExtra reflectors with master list..."
+export HOSTFILE=/tmp/DExtra_Hosts.txt
+export REFTYPE="XRF"
+cat $XLXFILE | xargs -r -l1 /usr/local/bin/checkref
+
+echo "Merging XLX DCS reflectors with master list..."
+export HOSTFILE=/tmp/DCS_Hosts.txt
+export REFTYPE="DCS"
+cat $XLXFILE | xargs -r -l1 /usr/local/bin/checkref
+
+echo "Installing New Host Files"
+sudo mv -f /tmp/*_Hosts.txt /usr/local/etc
+
+=========================================
+
+And this is the "checkref" script references in the above code snippet.
+=========================================
+#!/bin/bash
+
+REF="$1"
+TEST=`echo $REF | grep ^#`
+if ! [ "$TEST" = "" ]; then
+  exit 0
+fi
+TEST=`echo $REF | grep $REFTYPE`
+
+#echo -n "$REF, $TEST, "
+if [ "$TEST" = "" ]; then
+  CHECK=""
+  exit 0
+else
+  REF="^$REF"
+  CHECK=`cat $HOSTFILE | grep $REF`
+fi
+
+if ! [ "$CHECK" = "" ]; then
+  echo "Skipping duplicate entry $1"
+#  echo -n "$CHECK, "
+  exit 0
+fi
+
+echo "$@"
+echo -e "$1\t$2" >> $HOSTFILE
+========================================
+
+
+John   N6RCD
