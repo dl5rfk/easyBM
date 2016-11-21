@@ -22,7 +22,7 @@ if  [ $? -gt 0 ]; then
 fi
 
 while : ; do
-choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119]" --menu "\n\nPlease select:\n" 30 70 20 \
+choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119 by dl5rfk]" --menu "\n\nPlease select:\n" 30 70 20 \
 11 " Show IP-Addresses of this host " \
 12 " Show todays MMDVMHost Logfile " \
 21 " Edit Network 'interfaces' configuration file " \
@@ -30,6 +30,7 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119]" --menu "\n\nPlea
 23 " Edit 'ircddbgateway' configuration file " \
 24 " Edit easyBM Cronjobs " \
 25 " Edit YFSGateway configuration file " \
+41 " Set File Permission of MMDVM.ini file " \
 61 " Update D-Star Reflektor list " \
 62 " Update RPi Operating System " \
 63 " Update easyBM Scripts " \
@@ -37,8 +38,9 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119]" --menu "\n\nPlea
 65 " Update MMDVMHost-Dashboard " \
 71 " Turn off SWAP file " \
 72 " Turn off ttyAMA0 service " \
-91 " Restart MMDVM deamon " \
-92 " Restart ircddbgateway deamon " \
+91 " Restart MMDVM " \
+92 " Restart ircddbgateway " \
+94 " Restart YFSGateway " \
 93 " Restart Webserver lighttpd " \
 98 " Reboot System" \
 99 " Exit this menu "  3>&1 1>&2 2>&3)
@@ -59,6 +61,7 @@ case $choice in
 23) [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
 24) [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
 25) [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found"; sleep 15) ;;
+41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
 61) /opt/easyBM/easyBM-Update-DStar-Hostfiles.sh ;;
 62) 
 	clear
@@ -96,6 +99,7 @@ case $choice in
 91) /usr/bin/sudo systemctl restart mmdvmhost.service;;
 92) /usr/bin/sudo systemctl restart ircddbgateway.service;;
 93) /usr/bin/sudo systemctl restart lighttpd.service;;
+94) echo "Sorry, under construction";;
 98) /usr/bin/sudo reboot;;
 99) /bin/cat /etc/motd && exit;;
 esac

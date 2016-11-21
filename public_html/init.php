@@ -16,20 +16,19 @@ session_start();
  *
  */
 
-
 //EDIT THIS PATH
 $MMDVMINI='/opt/MMDVMHost/MMDVM.ini';
 $WPACONFIG='/etc/wpa_supplicant/wpa_supplicant.conf';
 $IRCDDBCFG='/etc/ircddbgateway';
 
+$CONFIG='config.php';
 
+if (!file_exists($MMDVMINI)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> MMDVM.ini is missing. </div></p>'; }
+if (!file_exists($WPACONFIG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> WIFI wpa_supplicant.conf is missing.</div></p>'; }
+if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> ircddbgateway config file is missing.</div></p>'; }
+if (file_exists($CONFIG)){ echo '<div class="alert alert-danger"> <h1>Danger! Web Control config file still exists. DO NOT USE THIS INIT PAGE.</h1></div></p>'; }
 
 /* ********** DO NOT CHANGE BELOW ********** */
-
-//INCLUDES DG9VH STUFF
-//include_once("MMDVMHost-Dashboard/config/config.php");
-//include_once("MMDVMHost-Dashboard/include/tools.php");
-
 
 //DEFINE SOME FUNCTIONS
 function check_callsign($callsign){
@@ -40,8 +39,6 @@ function command_exist($cmd) {
     $returnVal = shell_exec("which $cmd");
     return (empty($returnVal) ? false : true);
 }
-
-
 
 //THE REBOOT THING
 if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="nofunction"; }
@@ -71,7 +68,7 @@ if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="
 <br />
 <div class="container">
     <div class="jumbotron">
-      <h1>easyBM <small>initalize your DVMega System</small></h1>
+      <h1>easyBM <small>initalize your System</small></h1>
       <p>Enter some data, and your are ready to go for the digital ham radio network <strong>BrandMeister</strong>.<a href="#" class="" data-toggle="modal" data-target="#myModal"> <small>(Show MMDVM.ini)</small> </a></p>
 <!-- Show Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -213,7 +210,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	<?php endif; ?>
 
 		<div class="list-group">
-		<a href="#" class="list-group-item active">Your DVMega System settings:</a>
+		<a href="#" class="list-group-item active">Your system settings:</a>
 		<a href="#" class="list-group-item">Configuration File at &nbsp;<?php echo $MMDVMINI;?></a>
 		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Callsign=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your Callsign</a>
 		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Id=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your DMR ID</a>
@@ -226,10 +223,10 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^gatewayCallsign=.*$/p' $IRCDDBCFG " ))[1]; ?>_G &nbsp; is your D-Star Gateway Callsign</a>
 		<a href="<?php echo explode('=',exec("/bin/sed -n '/^url=.*$/p' $IRCDDBCFG " ))[1]; ?>" class="list-group-item" target="_blank">&nbsp; Check your ircddb Status</a>
 		</div>
-		<p>We believe it makes sense if each hotspot using the same frequency. Therefore, this was set to 433.6125MHz.</p>
+		<p>We believe it makes sense, if each hotspot using the same frequency. Therefore, your QRG was set to 433.6125MHz.</p>
 		<br />
 
-		<p class="text-center text-muted">Thank´s for using easyBM, it is a BrandMeister Germany Project. Please make a Donation, if you would like.</p>
+		<p class="text-center text-muted">Thank´s for using easyBM, it is a BrandMeister Germany Project. If you like, please make a donation.</p>
 		<center>
 		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
 		 <input type="hidden" name="cmd" value="_donations">

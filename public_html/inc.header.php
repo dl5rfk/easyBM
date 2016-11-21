@@ -1,7 +1,8 @@
 <?php 
 session_start(); 
 
-include('inc.defaults.php');
+if (file_exists ("config.php") ) { include_once('config.php'); }
+
 include_once('inc.functions.php');
 
 //FOR DEBUG ONLY
@@ -10,14 +11,10 @@ if( PHPDEBUG == TRUE){
 	ini_set("display_errors", 1);
 }
 
-
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 900)) {
-
         session_destroy();
         header('Location: http://'.$_SERVER['SERVER_NAME'].'/admin/logout.php');
-
  }
-
 
 //CHECK SESSISION TIME
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 900)) {
@@ -54,6 +51,16 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
     </style>
     
     <title>easyBM</title>
+
+
+    <script type="text/javascript">
+	function popupwindow (url) {
+	   fenster = window.open(url, "window1", "width=800,height=600,status=yes,scrollbars=yes,resizable=yes");
+	   fenster.focus();
+	}
+</script>
+
+
   </head>
 
 <body>
@@ -71,18 +78,18 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="/MMDVMHost-Dashboard/">Dashboard</a></li>
-        
         <?php 
 	      if (isset($_SESSION['angemeldet']) && $_SESSION['angemeldet'] == 1 ) { ?>
 		<li class="dropdown">
                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Infos & Tool´s<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                   <li><a href="/admin/status.php">System Status</a></li>
+                   <li><a href="/admin/status.php">RPi System Status</a></li>
+        	   <li><a href="/MMDVMHost-Dashboard/">MMDVM Dashboard</a></li>
                    <li><a href="/admin/ircddbgatewaydashboard.php">ircDDB Dashboard</a></li>
                    <li><a href="/admin/bm-groups.php">BrandMeister TalkGroups</a></li>
                    <li><a href="/admin/searchid.php">Search ID</a></li>
                    <li><a href="/admin/tools.php">Net Tools</a></li>
+                   <li><a href="/admin/webconsole.php">SSH WebConsole</a></li>
                    <li class="divider"></li>
                   </ul>
                 </li>		
@@ -97,7 +104,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
                   </ul>
                 </li>
 		<li class="dropdown">
-            	 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit files<b class="caret"></b></a>
+            	 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Fileedit<b class="caret"></b></a>
             	  <ul class="dropdown-menu">
 		   <li><a href="/admin/mmdvmini.php">MMDVM.ini</a></li>
 		   <li><a href="/admin/ircddbgateway.php">ircddbgateway</a></li>
@@ -126,5 +133,11 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
   </div><!-- /.container-fluid -->
 </nav>
 
- <?php echo "<br /><pre>"; print_r($_SESSION); echo "</pre><br />" ?>
+<?php 
 
+if( PHPDEBUG == TRUE){
+	echo "<br />SESSION-CONTENT:<br /><pre>"; 
+	print_r($_SESSION); 
+	echo "</pre><br />";
+}
+?>

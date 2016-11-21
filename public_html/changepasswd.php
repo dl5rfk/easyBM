@@ -31,16 +31,18 @@ if ($passwd === $passwd2) {
 	fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", TRUE);"."\n");
 	fwrite($configfile,'define("SETUPTIME","'. date("Y-m-d H:i:s") .'");'."\n");
         fwrite($configfile,"define(\"PHPDEBUG\", FALSE);"."\n");
+	fwrite($configfile,"define(\"LOGPATH\", \"/mnt/ramdisk/\");"."\n");
+	fwrite($configfile,"define(\"MMDVMPATH\", \"/opt/MMDVMHost/\");"."\n");
+	fwrite($configfile,"define(\"MMDVMINIFILE\", \"MMDVM.ini\");"."\n");
+	fwrite($configfile,"define(\"IRCDDBGATEWAY\", \"ircddbgateway\");"."\n");
+	fwrite($configfile,"\$MMDVMINI='/opt/MMDVMHost/MMDVM.ini';"."\n");
+	fwrite($configfile,"\$WPACONFIG='/etc/wpa_supplicant/wpa_supplicant.conf';"."\n");
+	fwrite($configfile,"\$IRCDDBCFG='/etc/ircddbgateway';"."\n");
 	fwrite($configfile,"?>\n");
 	fclose($configfile);
 
 	$file = file_get_contents("config.php");
-	echo $file;
-
 	include_once("inc.header.php");
-
-	echo $_SERVER['HTTP_REFERER'];
-
 ?>
 	  <div class="container">
 	   <div class="jumbotron">

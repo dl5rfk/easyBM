@@ -23,7 +23,7 @@ if (isset($_SESSION['angemeldet'])){
 <div class="container">
     <div class="jumbotron">
         <div class="row">
-        <h1>Ping <small>Check response time</small></h1>
+        <h1>Ping <small>Check host response time</small></h1>
 
 <?php 
 //  This script was writen by webmaster@theworldsend.net, Aug.2001 
@@ -49,27 +49,27 @@ If ($register_globals)
 }  
 else  
 { 
-   $submit = $_GET['submit']; 
-   $count  = $_GET['count']; 
-   $host   = $_GET['host']; 
+   if (isset($_GET['submit'])){ $submit = $_GET['submit']; } else { $submit=""; }
+   if (isset($_GET['count'])){ $count=$_GET['count']; } else { $count=4; }
+   if (isset($_GET['host'])){ $host = $_GET['host']; } else { $host='localhost'; }
    $ip     = $_SERVER['REMOTE_ADDR']; 
    $self   = $_SERVER['PHP_SELF']; 
 }; 
 // form submitted ? 
-If ($submit == "Ping!")  
+if ($submit == "Ping!")  
 { 
    // over count ? 
-   If ($count > $max_count)  
+   if ($count > $max_count)  
    { 
-      echo 'Maximum for count is: '.$max_count; 
-      echo '<a href="'.$self.'">Back</a>'; 
+      echo '<p class="bg-danger"> Maximum for count is: '.$max_count . '</p>'; 
+      echo '<p><a href="'.$self.'">OK, go back</a></p>'; 
    } 
    else  
    { 
       // replace bad chars 
       $host= preg_replace ("/[^A-Za-z0-9.-]/","",$host); 
       $count= preg_replace ("/[^0-9.]/","",$count); 
-      echo("Ping Output:<br>");  
+      echo '<p class="bg-info">Ping Output:<br /></p>';  
       echo '<pre>';            
       //check target IP or domain 
       if ($unix)  
@@ -88,7 +88,7 @@ else
 { 
     echo '<p><font size="2">Your IP is: '.$ip.'</font></p>'; 
     echo '<form methode="post" action="'.$self.'">'; 
-    echo '   Enter IP or Host <input type="text" name="host" value="'.$ip.'"></input>'; 
+    echo '   Enter IP-Addr or Hostname <input type="text" name="host" value="'.$ip.'"></input>'; 
     echo '   Enter Count <input type="text" name="count" size="2" value="4"></input>'; 
     echo '   <input type="submit" name="submit" value="Ping!"></input>'; 
     echo '</form>'; 
@@ -129,18 +129,17 @@ If ($register_globals)
 }  
 else  
 { 
-   $submit = $_GET['submit']; 
-   $host   = $_GET['host']; 
+   if (isset($_GET['submit'])){ $submit = $_GET['submit']; } else { $submit=""; }
+   if (isset($_GET['host'])) { $host = $_GET['host']; } else { $host='localhost'; }
    $ip     = $_SERVER['REMOTE_ADDR']; 
    $self   = $_SERVER['PHP_SELF']; 
 }; 
 // form submitted ? 
-If ($submit == "Traceroute!")  
+if ($submit == "Traceroute!")  
 { 
       // replace bad chars 
       $host= preg_replace ("/[^A-Za-z0-9.]/","",$host); 
-      echo '<body bgcolor="#FFFFFF" text="#000000"></body>'; 
-      echo("Trace Output:<br>");  
+      echo '<p class="bg-info">Trace Output:<br /></p>';  
       echo '<pre>';            
       //check target IP or domain 
       if ($unix)  
@@ -153,13 +152,12 @@ If ($submit == "Traceroute!")
          system("tracert $host"); 
       } 
       echo '</pre>';  
-      echo 'done ...';   
 }  
 else  
 { 
     echo '<p><font size="2">Your IP is: '.$ip.'</font></p>'; 
     echo '<form methode="post" action="'.$self.'">'; 
-    echo '   Enter IP or Host <input type="text" name="host" value="'.$ip.'"></input>'; 
+    echo '   Enter IP-Addr or Hostname <input type="text" name="host" value="'.$ip.'"></input>'; 
     echo '   <input type="submit" name="submit" value="Traceroute!"></input>'; 
     echo '</form>'; 
     echo '<br><b>'.$system.'</b>'; 

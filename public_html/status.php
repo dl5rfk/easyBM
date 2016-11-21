@@ -31,6 +31,11 @@ if (isset($_SESSION['angemeldet'])){
 <div class="container"><div class="row">
 
 <h1>System Status</h1>
+<?php
+if (!file_exists($MMDVMINI)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> MMDVM.ini is missing. </div></p>'; }
+if (!file_exists($WPACONFIG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> WIFI wpa_supplicant.conf is missing.</div></p>'; }
+if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> ircddbgateway config file is missing.</div></p>'; }
+?>
 <table class="table">
 	<tr><td>Hostname</td><td><?php print(shell_exec("hostname")); ?></td></tr>
 	<tr><td>Kernel Version</td><td><?php print(shell_exec("uname -r")); ?></td></tr>

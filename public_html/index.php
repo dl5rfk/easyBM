@@ -56,13 +56,13 @@ if (isset($password) && !empty($password)){
 			<div class="container">
 			<div class="jumbotron">
 			  <h1>easyBM <small>Web Control Center</small></h1>
-			  <p>Now, please change your password:</p>
+			  <p>Now, please set your own password:</p>
 			  <div class="row">
 			  <div class="col-lg-6">
 			    <div class="input-group">
 			      <form action="changepasswd.php" method="post">
 			      <input name="password" type="password" class="form-control" placeholder="Your new password">
-			      <input name="password2" type="password" class="form-control" placeholder="Repeat your password">
+			      <input name="password2" type="password" class="form-control" placeholder="Repeat your new password">
 			      <span class="input-group-btn">
 			        <button class="btn btn-default" type="submit">Change password</button>
 			      </form>
@@ -76,24 +76,24 @@ if (isset($password) && !empty($password)){
    		   }
 	
 	} else {
+		//Login Failed, wrong password
 ?>
-		<! -- Login Failed, wrong password -->
 		<div class="container">
 		<div class="jumbotron">
 		  <h1>easyBM <small>Web Control Center</small></h1>
-		  <div class="alert alert-danger"><a href="/admin/index.php" class="">Login failed, please try again!</a></div>
+		  <div class="alert alert-danger"><strong>Login failed !</strong> <a href="/admin/index.php" class="btn btn-default">please try again</a></div>
 		</div>
 		</div>
 <?php
 	}
 } else {
 	
-	//NO CONFIG FOUND ELSE LOAD VALUES
+	//NO CONFIG FOUND, WRITE FILE
 	if (!file_exists ("config.php") ) {
 		$passwd = getInitialPassword(10);
 		$configfile = fopen("config.php", 'w');
 		fwrite($configfile,"<?php\n");
-		fwrite($configfile,"# This is an auto-generated config-filei by index.php !\n");
+		fwrite($configfile,"# This is an auto-generated file by index.php !\n");
 		fwrite($configfile,"# Be careful, when manual editing this!\n\n");
 		fwrite($configfile,"define(\"ADMINPASSWORD\", \"$passwd\");"."\n");
 		fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", FALSE);"."\n");
@@ -106,9 +106,9 @@ if (isset($password) && !empty($password)){
 		include("config.php");
 		$passwd = ADMINPASSWORD;
 		$passwdchgd = ADMINPASSWORDCHANGED;
-	}
+		$phpdebug = PHPDEBUG;
+		}
 ?>
-
 
 <div class="container">
 <div class="jumbotron">
@@ -134,6 +134,7 @@ if (isset($password) && !empty($password)){
 </div>
 <?php
 }
+
 //INC FOOTER
 include_once("inc.footer.php");
 ?>

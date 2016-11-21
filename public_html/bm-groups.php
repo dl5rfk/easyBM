@@ -17,54 +17,43 @@
 //INCLUDES
 include_once('inc.header.php');
 
-$url='https://brandmeister.network/dist/js/bm/groups.js';
-
-$json = file_get_contents($url); 
-$json = utf8_encode(ltrim($json, 'var groups=')); 
-$data = json_decode($json,true); 
-
-//var_dump($json);
-//print_r($data);
-?>
-<div class="container">
-    <div class="jumbotron">
-        <div class="row">
-        <h1>BrandMeister <small> Talk Groups </small></h1>
-<?php
-echo '<pre>'.$json.'</pre>';
-?>
-
-</div>
-</div>
-</div>
-
-
-<?php 
 if (isset($_SESSION['angemeldet'])){
-	
 
-	echo '<div class="container"><div class="row">';
-/*	
-	  if (count($data->groups)) {
-     	   // Open the table
-        	echo "<table>";
+  //$url='https://brandmeister.network/dist/js/bm/groups.js';
+  $url='https://api.brandmeister.network/v1.0/groups/';
+  $json = file_get_contents($url);
+  $json = utf8_encode(ltrim($json, 'var groups='));
+  $data = json_decode($json,true);
 
-          // Cycle through the array
-          	foreach ($data->groups as $idx => $stand) {
-            	// Output a row
-            	echo "<tr>";
-            	echo "<td>$stand->afko</td>";
-            	echo "<td>$stand->positie</td>";
-            	echo "</tr>";
-          }
-        // Close the table
-        echo "</table>";
-    	}
-*/	 
-	echo '</div></div>';
+?>
+
+	<div class="container">
+	    <div class="jumbotron">
+        	<div class="row">
+	        <h1>BrandMeister <small> DMR Talk Groups </small></h1>
+	        <table class="table table-hover"><thead><tr><th>Talk Group ID</th><th>Description</th></tr></thead>
+	        <tbody>
+
+        <?php
+        if ( count($data) > 0){
+
+            foreach($data as $key => $value){
+                echo '<tr><td>'.$key.'</td><td>'.$value.'</td></tr>';
+            }
+
+        } else { echo '<tr><td ><strong>Sorry, but the remote host has no Talk Group informations.</strong></td></tr>'; }
+
+        ?>
+
+        	</tbody>
+	        </table>
+	 	 </div>
+	    </div>
+	</div>
+
+<?php
 
 } else { echo pleaseLogin(); }
-
 include_once("inc.footer.php");
 
 ?>
