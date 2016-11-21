@@ -1,9 +1,11 @@
 #!/bin/bash
 #
-#by DL5RFK, use it as is....
+#by DL5RFK, use it as is....no warrenty or support 
 #
-#USE THIS SCRIPT TO CLEANUP BEFOR U MAKE A IMG
+#  USE THIS SCRIPT TO CLEANUP BEFOR YOU MAKE AN SSD-IMAGE
+#   (for internal use only)
 #
+#LAST CHANGE: 2016-11-09
 
 #should be root:dailout
 ls -l /dev/ttyAMA0

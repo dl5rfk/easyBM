@@ -15,7 +15,6 @@
  */
 
 //INCLUDES
-include_once('inc.auth.php');
 include_once('inc.header.php');
 
 $url='https://brandmeister.network/dist/js/bm/groups.js';

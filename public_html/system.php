@@ -14,16 +14,13 @@
  *
  */
 
-include_once("inc.auth.php");
 include_once("inc.header.php");
 if (isset($_SESSION['angemeldet'])){
-
 
 ?>
 
   <div class="container">
     <div class="jumbotron">
-
         <div class="row">
         <h1>easyBM <small>System</small></h1>
          <p>Sorry, under construction.</p>

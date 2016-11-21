@@ -97,7 +97,8 @@ if (isset($password) && !empty($password)){
 		fwrite($configfile,"# Be careful, when manual editing this!\n\n");
 		fwrite($configfile,"define(\"ADMINPASSWORD\", \"$passwd\");"."\n");
 		fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", FALSE);"."\n");
-		fwrite($configfile,"define(\"SETUPTIME\", date()"."\n");
+		fwrite($configfile,'define("SETUPTIME","'. date("Y-m-d H:i:s") .'");'."\n");
+		fwrite($configfile,"define(\"PHPDEBUG\", FALSE);"."\n");
 		fwrite($configfile,"?>\n");
 		fclose($configfile);
 	} else {
@@ -117,13 +118,13 @@ if (isset($password) && !empty($password)){
 
 	if (!$passwdchgd) {
 ?>
-  <p>It seems to be the first time you start easyBM. Please use the following password for login: <strong><?php echo $passwd; ?></strong></p>
-<?php  } else { echo '<p>Please logging into the system:</p>'; } ?>
+  <p>It seems to be the first time, that you start easyBM. So please use the following password for login:<br /> <strong><?php echo $passwd; ?></strong></p>
+<?php  } else { echo '<p>Enter your password:</p>'; } ?>
   <div class="row">
   <div class="col-lg-6">
       <form class="form-inline" role="form" action="index.php" method="post">    
 	<div class="form-group">
-		<input name="password" type="password" class="form-control" placeholder="preset password">
+		<input name="password" type="password" class="form-control" placeholder="password">
 		<button class="btn btn-default" type="submit">Login</button>
 	</div>
       </form>

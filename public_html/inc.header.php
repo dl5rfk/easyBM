@@ -1,12 +1,23 @@
 <?php 
 session_start(); 
 
-//FOR DEBUG ONLY
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
-
 include('inc.defaults.php');
 include_once('inc.functions.php');
+
+//FOR DEBUG ONLY
+if( PHPDEBUG == TRUE){
+	error_reporting(E_ALL);
+	ini_set("display_errors", 1);
+}
+
+
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 900)) {
+
+        session_destroy();
+        header('Location: http://'.$_SERVER['SERVER_NAME'].'/admin/logout.php');
+
+ }
+
 
 //CHECK SESSISION TIME
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 900)) {
@@ -60,21 +71,19 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="/MMDVMHost-Dashboard/">MMDVM-Dashboard<span class="sr-only"></span></a></li>
+        <li><a href="/MMDVMHost-Dashboard/">Dashboard</a></li>
         
         <?php 
 	      if (isset($_SESSION['angemeldet']) && $_SESSION['angemeldet'] == 1 ) { ?>
 		<li class="dropdown">
-                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Information<b class="caret"></b></a>
+                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Infos & Tool´s<b class="caret"></b></a>
                   <ul class="dropdown-menu">
                    <li><a href="/admin/status.php">System Status</a></li>
                    <li><a href="/admin/ircddbgatewaydashboard.php">ircDDB Dashboard</a></li>
                    <li><a href="/admin/bm-groups.php">BrandMeister TalkGroups</a></li>
                    <li><a href="/admin/searchid.php">Search ID</a></li>
                    <li><a href="/admin/tools.php">Net Tools</a></li>
-                   <li><a href="/admin/help.php">Help</a></li>
                    <li class="divider"></li>
-                   <li><a href="/admin/help.php#information">How to read</a></li>
                   </ul>
                 </li>		
 
@@ -85,7 +94,6 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 		   <li><a href="/admin/network.php">Network</a></li>
 		   <li><a href="/admin/gpio.php">GPIO</a></li>
                    <li class="divider"></li>
-                   <li><a href="/admin/help.php#configure">How to Config</a></li>
                   </ul>
                 </li>
 		<li class="dropdown">
@@ -95,12 +103,12 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 		   <li><a href="/admin/ircddbgateway.php">ircddbgateway</a></li>
 		   <li><a href="/admin/ysfgateway.php">YSFGateway.ini</a></li>
                	   <li class="divider"></li>
-               	   <li><a href="/admin/help.php#editing">How to edit</a></li>
            	  </ul>
          	</li>
 
 		<li><a href="/admin/restart.php">Restart</a></li>
 		<li><a href="/admin/about.php">About</a></li>
+               	<li><a href="/admin/help.php#editing">Help</a></li>
 		<?php } ?>
 		
 	  </ul>

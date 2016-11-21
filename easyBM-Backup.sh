@@ -1,7 +1,8 @@
 #/bin/bash 
 #
-#by DL5RFK, use it as is....
+#by DL5RFK, use it as is....no warrenty or support
 #
+#LATEST CHANGE: 2016-11-09
 
 clear 
 
@@ -14,6 +15,6 @@ fi
 echo
 echo "DONE......................................................................."
 echo
-echo " YOU FIND THE NEW BACKUP TAR-FILE AT /opt/backup/easyBM-Backup-`date -I`.tar.gz"
-echo 
+echo " YOU CAN FIND THE BACKUP FILE AT /opt/backup/easyBM-Backup-`date -I`.tar.gz"
+echo " Please copy the .tar.gz file to your local backup-storage." 
 echo

@@ -14,7 +14,6 @@
  *
  */
 
-include_once("inc.auth.php");
 function createConfigLines() {
         $out ="";
         foreach($_POST as $key=>$val) {

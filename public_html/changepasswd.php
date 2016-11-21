@@ -14,7 +14,6 @@
  *
  */
 
-//include("auth.php");
 
 //if ( $_SERVER['HTTP_REFERER'] == '/admin/index.php' && isset($_POST['password']) && isset($_POST['password2']) ){
 if ( isset($_POST['password']) && isset($_POST['password2']) ){
@@ -30,6 +29,8 @@ if ($passwd === $passwd2) {
 	fwrite($configfile,"# Be careful, when you manual editing this!\n\n");
 	fwrite($configfile,"define(\"ADMINPASSWORD\", \"$passwd\");"."\n");
 	fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", TRUE);"."\n");
+	fwrite($configfile,'define("SETUPTIME","'. date("Y-m-d H:i:s") .'");'."\n");
+        fwrite($configfile,"define(\"PHPDEBUG\", FALSE);"."\n");
 	fwrite($configfile,"?>\n");
 	fclose($configfile);
 
@@ -45,7 +46,7 @@ if ($passwd === $passwd2) {
 	   <div class="jumbotron">
 	    <h1>easyBM <small>Web Control Center</small></h1>
 	    <p>Control-Center for easy access to digital voice communication in amateur radio.</p>
-	    <p>Congratulations! Your Password is changed!</p>
+	    <p>Congratulations! Your Password is changed. Now, select a topic in the Menu.</p>
 	   </div>
 	  </div>
   
@@ -53,5 +54,5 @@ if ($passwd === $passwd2) {
 
 	include_once("inc.footer.php");
 	
-} else { echo "Sorry, can not update the config file, because password is not equal."; }
+} else { echo "Sorry, can not write the config file, because password is not equal."; }
 ?>

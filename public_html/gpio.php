@@ -2,7 +2,6 @@
 
 header('Cache-Control: no-store, no-cache, must-revalidate');
 
-include_once("inc.auth.php");
 include_once("inc.header.php");
 
 if (isset($_SESSION['angemeldet'])){

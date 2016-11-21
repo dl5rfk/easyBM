@@ -14,7 +14,6 @@
  *
  */
 
-include_once("inc.auth.php");
 include_once("inc.header.php");
 ?>
 

@@ -13,13 +13,7 @@
  * @see        http://www.bm262.de
  *
  */
-
-	unset($cfgpasswd);
-	unset($cfgpasswdchgd);
-	unset($_SESSION['passwdchanged']);
-	$_SESSION['angemeldet']=0;
-	unset($_SESSION['loginutime']);
-	session_unset();
+	session_start();
 	session_destroy();
 	
 	header('Location: /admin/index.php');
