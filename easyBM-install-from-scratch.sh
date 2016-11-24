@@ -61,7 +61,7 @@ check_result $? 'apt upgrade failed'
 pause
 
 echo -e "\n\n + installing Tools\n"
-sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync
+sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential
 
 # Checking wget
 if [ ! -e '/usr/bin/wget' ]; then

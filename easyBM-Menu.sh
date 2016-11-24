@@ -91,7 +91,9 @@ case $choice in
 	clear
 	cd /var/www/html/MMDVMHost-Dashboard 
 	/bin/cp /var/www/html/MMDVMHost-Dashboard/config/config.php /var/www/html/MMDVMHost-Dashboard/config/config.php.`/bin/date -I` && /usr/bin/git pull 
+	if [ -w /var/www/html/MMDVMHost-Dashboard/setup.php ]; then
 	/bin/mv /var/www/html/MMDVMHost-Dashboard/setup.php /var/www/html/MMDVMHost-Dashboard/setup.php.offline 
+	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;
 71) /usr/bin/sudo dphys-swapfile swapoff; if [ $?=0 ]; then /usr/bin/sudo whiptail --title "SWAP File" --msgbox "\n\nNow swapping is off !\n\n" 30 70; fi;;
