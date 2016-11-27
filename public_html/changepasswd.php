@@ -27,14 +27,25 @@ if ($passwd === $passwd2) {
 	fwrite($configfile,"<?php\n");
 	fwrite($configfile,"# This is an auto-generated config-file by easyBM-Control Center!\n");
 	fwrite($configfile,"# Be careful, when you manual editing this!\n\n");
+
 	fwrite($configfile,"define(\"ADMINPASSWORD\", \"$passwd\");"."\n");
 	fwrite($configfile,"define(\"ADMINPASSWORDCHANGED\", TRUE);"."\n");
+
 	fwrite($configfile,'define("SETUPTIME","'. date("Y-m-d H:i:s") .'");'."\n");
-        fwrite($configfile,"define(\"PHPDEBUG\", FALSE);"."\n");
+    fwrite($configfile,"define(\"PHPDEBUG\", FALSE);"."\n");
 	fwrite($configfile,"define(\"LOGPATH\", \"/mnt/ramdisk/\");"."\n");
+	
 	fwrite($configfile,"define(\"MMDVMPATH\", \"/opt/MMDVMHost/\");"."\n");
-	fwrite($configfile,"define(\"MMDVMINIFILE\", \"MMDVM.ini\");"."\n");
-	fwrite($configfile,"define(\"IRCDDBGATEWAY\", \"ircddbgateway\");"."\n");
+	fwrite($configfile,"define(\"MMDVMINIPATH\", \"/opt/MMDVMHost/\");"."\n");
+	fwrite($configfile,"define(\"MMDVMINIFILENAME\", \"MMDVM.ini\");"."\n");
+	
+	fwrite($configfile,"define(\"IRCDDBGATEWAY\", \"ircddbgatewayd\");"."\n");
+	fwrite($configfile,"define(\"IRCDDBGATEWAYPATH\", \"/etc/\");"."\n");
+	fwrite($configfile,"define(\"IRCDDBGATEWAYINIFILENAME\", \"ircddbgateway\");"."\n");
+	
+	fwrite($configfile,"define(\"YSFHOSTSPATH\", \"/etc/YFSGateway/\");"."\n");
+	fwrite($configfile,"define(\"YSFGATEWAYINIFILENAME\", \"YFSGateway.ini\");"."\n");
+	
 	fwrite($configfile,"\$MMDVMINI='/opt/MMDVMHost/MMDVM.ini';"."\n");
 	fwrite($configfile,"\$WPACONFIG='/etc/wpa_supplicant/wpa_supplicant.conf';"."\n");
 	fwrite($configfile,"\$IRCDDBCFG='/etc/ircddbgateway';"."\n");

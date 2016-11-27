@@ -1,7 +1,7 @@
 <?php 
 session_start(); 
 
-if (file_exists ("config.php") ) { include_once('config.php'); }
+if (file_exists ("config.php") ) { include_once('config.php'); } else {  echo "<hr>";  }
 
 include_once('inc.functions.php');
 
@@ -97,18 +97,21 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 		<li class="dropdown">
 		 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuration<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-		   <li><a href="/admin/system.php">System</a></li>
-		   <li><a href="/admin/network.php">Network</a></li>
-		   <li><a href="/admin/gpio.php">GPIO</a></li>
-                   <li class="divider"></li>
+				   <li><a href="/admin/config_system.php">System</a></li>
+				   <li><a href="/admin/config_network.php">IP Network</a></li>
+				   <li><a href="/admin/gpio.php">GPIO-Ports</a></li>
+				   <li class="divider"></li>
+				   <li><a href="/admin/config_mmdvm.php">MMDVM (DMR)</a></li>
+				   <li><a href="/admin/config_ircddbgateway.php">ircddbgateway (D-Star)</a></li>
+				   <li><a href="/admin/config_ysfgateway.php">YSFGateway (C4FM)</a></li>						   
                   </ul>
                 </li>
 		<li class="dropdown">
-            	 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Fileedit<b class="caret"></b></a>
+            	 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit<b class="caret"></b></a>
             	  <ul class="dropdown-menu">
-		   <li><a href="/admin/mmdvmini.php">MMDVM.ini</a></li>
-		   <li><a href="/admin/ircddbgateway.php">ircddbgateway</a></li>
-		   <li><a href="/admin/ysfgateway.php">YSFGateway.ini</a></li>
+		   <li><a href="/admin/edit_mmdvmini.php">MMDVM.ini</a></li>
+		   <li><a href="/admin/edit_ircddbgateway.php">ircddbgateway</a></li>
+		   <li><a href="/admin/edit_ysfgateway.php">YSFGateway.ini</a></li>
                	   <li class="divider"></li>
            	  </ul>
          	</li>

@@ -51,17 +51,32 @@ function is_loggedin(){
 */
 
 function getMMDVMConfig() {
-        // loads MMDVM.ini into array for further use
+        // loads into array for further use
         $conf = array();
-        if ($configs = fopen(MMDVMINIPATH."/".MMDVMINIFILENAME, 'r')) {
+        $conf = parse_ini_file(MMDVMINIPATH."/".MMDVMINIFILENAME,TRUE);
+        /*
+        if ($configs = fopen(MMDVMINIPATH."/".MMDVMINIFILENAME, 'r')) {	
                 while ($config = fgets($configs)) {
                         array_push($conf, trim ( $config, " \t\n\r\0\x0B"));
                 }
                 fclose($configs);
         }
+        */
         return $conf;
 }
 
+function getIRCDDBGATEWAYConfig() {
+        // loads ini into array for further use
+        $conf = array();
+        $conf = parse_ini_file(IRCDDBGATEWAYPATH."/".IRCDDBGATEWAYINIFILENAME,TRUE);
+        return $conf;
+}
 
+function getYSFGATEWAYConfig() {
+        // loads ini into array for further use
+        $conf = array();
+        $conf = parse_ini_file(YSFHOSTSPATH."/".YSFGATEWAYINIFILENAME,TRUE);
+        return $conf;
+}
 
 ?>
