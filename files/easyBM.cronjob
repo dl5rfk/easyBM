@@ -4,6 +4,6 @@
 #Restart MMDVMHost daily at 00:00
 #0 0 * * * root systemctl restart mmdvmhost.service >/dev/null 2>&1
 #
-*/3 * * * * root /opt/easyBM/public_html/update_rrd_database.sh >/dev/null 2>&1
-*/15 * * * * root /opt/easyBM/public_html/create_rrd_graph.sh   >/dev/null 2>&1
-*/10 * * * * root /usr/bin/wget -O /etc/YSFGateway/YSFHosts.txt http://register.ysfreflector.de/export_csv.php >/dev/null 2>&1
+*/3 * * * * root /opt/easyBM/public_html/update_rrd_database.sh >/mnt/ramdisk/lastrun.update_rrd.log 2>&1
+*/6 * * * * root /opt/easyBM/public_html/create_rrd_graph.sh    >/mnt/ramdisk/lastrun.create_rrd_graph.log 2>&1
+*/30 * * * * root /usr/bin/wget -O /etc/YSFGateway/YSFHosts.txt http://register.ysfreflector.de/export_csv.php >/dev/null 2>&1

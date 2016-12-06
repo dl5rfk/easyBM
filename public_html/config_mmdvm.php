@@ -55,6 +55,20 @@ if (isset($_SESSION['angemeldet'])){
 		  </div>
 		</div>
 		<div class="form-group">
+                  <label class="col-md-4 control-label" for="location">Your Latitude</label>
+                  <div class="col-md-4">
+                  <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Latitude]; ?>">
+                  <span class="help-block">Let us know, where your are located.</span>
+                </div>
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="location">Your Longitude</label>
+                  <div class="col-md-4">
+                  <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Longitude]; ?>">
+                  <span class="help-block">Let us know, where your are located.</span>
+                  </div>
+                </div>
+
+		<div class="form-group">
 		  <label class="col-md-4 control-label" for="url">Your URL</label>
 		  <div class="col-md-4">
 		  <input id="url" name="url" maxlength="124" type="text" placeholder="https://www.qrz.com/db/callsign" class="form-control input-md" required="" value="<?php echo $arr_config[Info][URL]; ?>">
@@ -69,7 +83,30 @@ if (isset($_SESSION['angemeldet'])){
 		  </div>
 		</div>
 
-	<legend>DMR Network</legend>
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="description">RX-Frequency</label>
+                  <div class="col-md-4">
+                  <input id="description" name="description" maxlength="20" type="text" placeholder="433612500" class="form-control input-md" required="" value="<?php echo $arr_config[Info][RXFrequency]; ?>">
+                  <span class="help-block">Your RX frequency.</span>
+                  </div>
+                </div>
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="description">TX-Frequency</label>
+                  <div class="col-md-4">
+                  <input id="description" name="description" maxlength="20" type="text" placeholder="433612500" class="form-control input-md" required="" value="<?php echo $arr_config[Info][TXFrequency]; ?>">
+                  <span class="help-block">Your TX frequency.</span>
+                  </div>
+                </div>
+
+
+	<legend>DMR Settings</legend>
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="id">Your DMR ID</label>
+                  <div class="col-md-4">
+                  <input id="id" name="id" type="text" placeholder="2621234" class="form-control input-md" required="" value="<?php echo $arr_config[DMR][Id]; ?>">
+                  <span class="help-block">This is your own DMR ID.</span>
+                  </div>
+                </div>
 		<div class="form-group">
        		  <label class="col-md-4 control-label" for="serveraddress">Server Address</label>
                  <div class="col-md-4">
@@ -96,6 +133,51 @@ if (isset($_SESSION['angemeldet'])){
 		  &nbsp;&nbsp;<button type="submit" class="btn btn-success">Now, save and initalize ....</button>
 		  <input name="submited" type="hidden" value="true">
 	        </div>
+
+	<legend>D-Star Settings</legend>
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="id">D-Star Enable</label>
+                  <div class="col-md-4">
+                        <label class="radio-inline"> <input type="radio" name="dstar-enable" id="dstar-enable" value="1"> Yes </label>
+                        <label class="radio-inline"> <input type="radio" name="dstar-enable" id="dstar-enable" value="0"> No </label>
+                  <span class="help-block">Enable or Disable D-Star function.</span>
+                  </div>
+                </div>
+
+		<div class="form-group">
+                  <label class="col-md-4 control-label" for="id">D-Star Modul</label>
+                  <div class="col-md-4">
+			<label class="radio-inline"> <input type="radio" name="inlineRadioOptions" id="inlineRadio1" value="A"> A </label>
+			<label class="radio-inline"> <input type="radio" name="inlineRadioOptions" id="inlineRadio2" value="B"> B </label>
+			<label class="radio-inline"> <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="C"> C </label>
+			<label class="radio-inline"> <input type="radio" name="inlineRadioOptions" id="inlineRadio3" value="D"> D </label>
+                  <span class="help-block">This is for RPT1 settings.</span>
+                  </div>
+                </div>
+
+	<legend>System Fusion Settings</legend>
+		 <div class="form-group">
+                  <label class="col-md-4 control-label" for="id">C4FM Enable</label>
+                  <div class="col-md-4">
+                        <label class="radio-inline"> <input type="radio" name="c4fm-enable" id="c4fm-enable" value="1"> Yes </label>
+                        <label class="radio-inline"> <input type="radio" name="c4fm-enable" id="c4fm-enable" value="0"> No </label>
+                  <span class="help-block">Enable or Disable C4FM System Fusion function.</span>
+                  </div>
+                </div>
+
+	 <legend>P25 Settings</legend>
+                 <div class="form-group">
+                  <label class="col-md-4 control-label" for="id">P25 Enable</label>
+                  <div class="col-md-4">
+                        <label class="radio-inline"> <input type="radio" name="p25-enable" id="p25-enable" value="1"> Yes </label>
+                        <label class="radio-inline"> <input type="radio" name="p25-enable" id="p25-enable" value="0"> No </label>
+                  <span class="help-block">Enable or Disable D-Star Function.</span>
+                  </div>
+                </div>
+
+
+
+
 
 		</form>
 

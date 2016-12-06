@@ -1,5 +1,9 @@
 <?php 
-
+/*
+ * some functions,accessable from all pages
+ *
+ *
+ */
 
 //
 function getSymbolByQuantity($bytes) {
@@ -8,9 +12,9 @@ function getSymbolByQuantity($bytes) {
                 return sprintf('%.3f '.$symbol[$exp], ($bytes/pow(1024, floor($exp))));
 }
 
-//
+//printout messages
 function pleaseLogin() {
-	echo '<div class="alert alert-danger" ><center><strong>Sorry, please login first !</strong></center></div>';
+	echo '<p><div class="alert alert-danger" ><center><strong>Sorry, please login first !</strong></center></div></p>';
 }
 
 //
@@ -50,6 +54,7 @@ function is_loggedin(){
 }
 */
 
+//load ini file into an array
 function getMMDVMConfig() {
         // loads into array for further use
         $conf = array();
@@ -65,6 +70,7 @@ function getMMDVMConfig() {
         return $conf;
 }
 
+//load ini file into an array
 function getIRCDDBGATEWAYConfig() {
         // loads ini into array for further use
         $conf = array();
@@ -72,6 +78,7 @@ function getIRCDDBGATEWAYConfig() {
         return $conf;
 }
 
+//load ini file into an array
 function getYSFGATEWAYConfig() {
         // loads ini into array for further use
         $conf = array();
@@ -79,4 +86,21 @@ function getYSFGATEWAYConfig() {
         return $conf;
 }
 
+
+//if you load a ini, you have to write it back, not parse_ini_file
+// usage:  put_ini_file(string $file, array $array)
+function put_ini_file($file, $array, $i = 0){
+  $str="";
+  foreach ($array as $k => $v){
+    if (is_array($v)){
+      $str.=str_repeat(" ",$i*2)."[$k]".PHP_EOL; 
+      $str.=put_ini_file("",$v, $i+1);
+    }else
+      $str.=str_repeat(" ",$i*2)."$k = $v".PHP_EOL; 
+  }
+if($file)
+    return file_put_contents($file,$str);
+  else
+    return $str;
+}
 ?>

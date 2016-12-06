@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -L "/opt/easyBM/public_htmlvar/www/html/admin/latency_graph.png" ];then 
+if [ ! -L "/opt/easyBM/public_html/latency_graph.png" ];then 
  if [ -f "/mnt/ramdisk/latency_graph.png" ];then
  ln -s /mnt/ramdisk/latency_graph.png /opt/easyBM/public_html/latency_graph.png
  fi

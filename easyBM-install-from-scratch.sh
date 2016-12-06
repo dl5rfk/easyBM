@@ -61,7 +61,7 @@ check_result $? 'apt upgrade failed'
 pause
 
 echo -e "\n\n + installing Tools\n"
-sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential
+sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp
 
 # Checking wget
 if [ ! -e '/usr/bin/wget' ]; then
@@ -224,6 +224,8 @@ sudo mv /var/www/opendv-1.hlp /var/www/html/ircddbgateway/
 sudo mv /var/www/opendvconfig.php /var/www/html/ircddbgateway/
 sudo echo "<?php header('Location: ircddbgateway.php'); ?>" > /var/www/html/ircddbgateway/index.php
 sudo chown -R www-data:www-data /var/www/html/ircddbgateway/
+ln -s var/www/html/ircddbgateway/ircddblocal.php /var/www/html/ircddblocal.php
+
 
 ls -lsa /etc/ircddbgateway
 ls -lsa /home/opendv/ircddbgateway/ircddbgateway

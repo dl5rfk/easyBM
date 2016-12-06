@@ -83,7 +83,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 		<li class="dropdown">
                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Infos & Tool´s<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                   <li><a href="/admin/status.php">RPi System Status</a></li>
+                   <li><a href="/admin/status.php">System Status</a></li>
         	   <li><a href="/MMDVMHost-Dashboard/">MMDVM Dashboard</a></li>
                    <li><a href="/admin/ircddbgatewaydashboard.php">ircDDB Dashboard</a></li>
                    <li><a href="/admin/bm-groups.php">BrandMeister TalkGroups</a></li>

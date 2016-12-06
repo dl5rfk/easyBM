@@ -81,9 +81,12 @@ case $choice in
 	  echo "Sorry, MMDVMHost directory not exists in /opt/ !" 
 	  exit 1;
 	fi
-	cd /opt/MMDVMHost/ && /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I` && /usr/bin/git pull
+	cd /opt/MMDVMHost/ && /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
+	/usr/bin/git pull
 	if [ $? -eq 0 ]; then
 	  /usr/bin/make && /bin/systemctl stop mmdvmhost.service && /bin/systemctl start mmdvmhost.service
+	else 
+	  /usr/bin/sudo whiptail --title "ERROR" --msgbox "Update failed, sorry !\n\n Please try to update manualy " 30 70
 	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;

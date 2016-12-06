@@ -4,8 +4,13 @@
 #This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
 
 #settings
-command="/bin/ping -q -n -c 5"
+pcommand="/bin/ping -q -n -c 5"
+hosttoping="google.com"
+rrdbfile="/mnt/ramdisk/latency_db.rrd"
 
+#
+#
+#
 /usr/bin/which gawk > /dev/null
 if [ $? -gt 0 ]; then 
  /usr/bin/apt install gawk
@@ -17,9 +22,6 @@ if [ $? -gt 0 ]; then
  /usr/bin/apt install rrdtool
 fi 
 rrdtool="/usr/bin/rrdtool"
-
-hosttoping="google.com"
-rrdbfile="/mnt/ramdisk/latency_db.rrd"
 
 #initialize rrd database
 if [ ! -f "$rrdbfile" ]; then
@@ -33,7 +35,7 @@ fi
 
 #data collection routine 
 get_data() {
-    local output=$($command $1 2>&1)
+    local output=$($pcommand $1 2>&1)
     local method=$(echo "$output" | $gawk '
         BEGIN {pl=100; rtt=0.1}
         /packets transmitted/ {

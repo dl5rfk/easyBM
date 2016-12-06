@@ -53,10 +53,10 @@ if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Da
 
 <br />
 <h2>Internet Latency Graph</h2>
-<img src="/admin/latency_graph.png" class="img-responsive" alt="Latency Graph for your Internet Access">
+<center><img src="/admin/latency_graph.png" class="img-responsive" alt="Latency Graph for your Internet Access"></center>
 
 <br /> <br />
-<p class="text-danger"><strong>Note:</strong>&nbsp;It is essential that the easyBM Hotspot has a connection to the Internet, otherwise this Website will not work properly.</p>
+<p class="text-danger"><strong>Note:</strong>&nbsp;It is essential that you have access to the internet, otherwise this website will not work properly.</p>
 
 </div></div>
 
