@@ -20,10 +20,7 @@ if (isset($_SESSION['angemeldet'])){
 
 	$arr_config = getYSFGATEWAYConfig();
 
-	echo "<pre>";
-	print_r($arr_config);
-	echo "</pre>";
-
+	if ( PHPDEBUG == TRUE ){ echo "<pre>"; print_r($arr_config); echo "</pre>"; }
 
 ?>
     <div class="container">
@@ -76,46 +73,43 @@ Debug=1
 */
 ?>
 
-
 	 <legend>General</legend>
-                <div class="form-group">
-                  <label class="col-md-4 control-label" for="callsign">Your Callsign</label>
-                  <div class="col-md-4">
-                  <input id="callsign" name="callsign" type="text" placeholder="DL1ABC" class="form-control input-md" required="" value="<?php echo $arr_config[General][Callsign]; ?>">
-                  <span class="help-block">This is your own callsign.</span>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 control-label" for="id">Your DMR ID</label>
-                  <div class="col-md-4">
-                  <input id="id" name="id" type="text" placeholder="2621234" class="form-control input-md" required="" value="<?php echo $arr_config[DMR][Id]; ?>">
-                  <span class="help-block">This is your own DMR ID.</span>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 control-label" for="location">Your Location</label>
-                  <div class="col-md-4">
-                  <input id="location" name="location" maxlength="20" type="text" placeholder="HamTown" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Location]; ?>">
-                  <span class="help-block">Let us know, where your are located.</span>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 control-label" for="location">Your Latitude</label>
-                  <div class="col-md-4">
-                  <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Latitude]; ?>">
-                  <span class="help-block">Let us know, where your are located.</span>
-                </div>
-                <div class="form-group">
-                  <label class="col-md-4 control-label" for="location">Your Longitude</label>
-                  <div class="col-md-4">
-                  <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Longitude]; ?>">
-                  <span class="help-block">Let us know, where your are located.</span>
-                  </div>
-                </div>
+         <div class="form-group">
+          <label class="col-md-4 control-label" for="callsign">Your Callsign</label>
+           <div class="col-md-4">
+            <input id="callsign" name="callsign" type="text" placeholder="DL1ABC" class="form-control input-md" required="" value="<?php echo $arr_config[General][Callsign]; ?>">
+            <span class="help-block">This is your own callsign.</span>
+           </div>
+          </div>
+         <div class="form-group">
+          <label class="col-md-4 control-label" for="id">Your DMR ID</label>
+           <div class="col-md-4">
+            <input id="id" name="id" type="text" placeholder="2621234" class="form-control input-md" required="" value="<?php echo $arr_config[DMR][Id]; ?>">
+            <span class="help-block">This is your own DMR ID.</span>
+           </div>
+          </div>
+         <div class="form-group">
+          <label class="col-md-4 control-label" for="location">Your Location</label>
+            <div class="col-md-4">
+              <input id="location" name="location" maxlength="20" type="text" placeholder="HamTown" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Location]; ?>">
+              <span class="help-block">Let us know, where your are located.</span>
+             </div>
+         </div>
+         <div class="form-group">
+           <label class="col-md-4 control-label" for="location">Your Latitude</label>
+             <div class="col-md-4">
+              <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Latitude]; ?>">
+              <span class="help-block">Let us know, where your are located.</span>
+             </div>
+         <div class="form-group">
+           <label class="col-md-4 control-label" for="location">Your Longitude</label>
+            <div class="col-md-4">
+             <input id="location" name="location" maxlength="20" type="text" placeholder="0.0" class="form-control input-md" required="" value="<?php echo $arr_config[Info][Longitude]; ?>">
+             <span class="help-block">Let us know, where your are located.</span>
+            </div>
+         </div>
 
 
-	<fieldset>
-	</fieldset>
 	</form>
 	</div> <!--/jumbotron-->
 	</div> <!--/container-->

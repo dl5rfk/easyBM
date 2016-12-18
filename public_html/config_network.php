@@ -17,46 +17,66 @@
 include_once("inc.header.php");
 if (isset($_SESSION['angemeldet'])){
 
+exec('/sbin/ifconfig', $ipdata);
+$ipdata = implode($ipdata, '\n');
+
+foreach (preg_split("/\n\n/", $ipdata) as $int) {
+  preg_match("/^([A-z]*\d)\s+Link\s+encap:([A-z]*)\s+HWaddr\s+([A-z0-9:]*).*" .
+    "inet addr:([0-9.]+).*Bcast:([0-9.]+).*Mask:([0-9.]+).*" .
+    "inet6 addr:\s([a-f0-9:\/]+).*Scope:Link.*" .
+     "MTU:([0-9.]+).*Metric:([0-9.]+).*" .
+     "RX packets:([0-9.]+).*errors:([0-9.]+).*dropped:([0-9.]+).*overruns:([0-9.]+).*frame:([0-9.]+).*" .
+     "TX packets:([0-9.]+).*errors:([0-9.]+).*dropped:([0-9.]+).*overruns:([0-9.]+).*carrier:([0-9.]+).*" .
+     "RX bytes:([0-9.]+).*\((.*)\).*TX bytes:([0-9.]+).*\((.*)\)" .
+     "/ims", $int, $regex);
+
+    if (!empty($regex)) {
+      $interface = array(); 
+      $interface['name'] = $regex[1]; 
+      $interface['type'] = $regex[2]; 
+      $interface['mac'] = $regex[3]; 
+      $interface['ip'] = $regex[4]; 
+      $interface['broadcast'] = $regex[5]; 
+      $interface['netmask'] = $regex[6]; 
+      $interface['ipv6'] = $regex[7]; 
+      $interface['mtu'] = $regex[8]; 
+      $interface['metric'] = $regex[9]; 
+      $interface['rx']['packets'] = $regex[10]; 
+      $interface['rx']['errors'] = $regex[11]; 
+      $interface['rx']['dropped'] = $regex[12]; 
+      $interface['rx']['overruns'] = $regex[13]; 
+      $interface['rx']['frame'] = $regex[14]; 
+      $interface['rx']['bytes'] = $regex[20]; 
+      $interface['rx']['hbytes'] = $regex[21]; 
+      $interface['tx']['packets'] = $regex[15]; 
+      $interface['tx']['errors'] = $regex[16]; 
+      $interface['tx']['dropped'] = $regex[17]; 
+      $interface['tx']['overruns'] = $regex[18]; 
+      $interface['tx']['carrier'] = $regex[19]; 
+      $interface['tx']['bytes'] = $regex[22]; 
+      $interface['tx']['hbytes'] = $regex[22];
+      $interfaces[] = $interface;
+    }
+}
+
 ?>
 
 
   <div class="container">
     <div class="jumbotron">
-      <h1>easyBM <small>under contruction</small></h1>
-
+      <h1>easyBM <small>IP Network settings</small></h1>
 
 <?php
-
-  $submask = exec("ifconfig eth0 | grep inet", $out);
-    $submask = str_ireplace("inet addr:", "", $submask);
-    $submask = str_ireplace("Mask:", "", $submask);
-    $submask = trim($submask);
-    $submask = explode(" ", $submask);
-   $ip_adress=$submask[0];
-   $mask=$submask[4];
-   
-   $gatewayType = shell_exec("route -n");
-   $gatewayTypeRaw = explode(" ", $gatewayType);
-   $gateway=$gatewayTypeRaw[42];
-   
-   $dnsType = file('/etc/resolv.conf');
-   $dnsType = str_ireplace("nameserver ", "", $dnsType);
-   $dns1 = $dnsType[2];
-   $dns2 = $dnsType[3];
-   $dns3 = $dnsType[4];
-
-   $hostname = GETHOSTNAME();
-
-	echo $submask;
-	echo $ip_adress;
-	echo $mask;
-	echo $gateway;
-	echo $dns1;
-	echo $dns2;
-	echo $dns3;
-	echo $hostname;
+//	echo"<pre>";
+//	print_r($interfaces);
+//	echo"</pre>";
+	echo '<table class="table"></tr><th>Name</th><th>MAC-Addr</th><th>IPv4/Netmask</th><th>IPv6</th><th>RX/TX Errors</th></tr>';
+	foreach($interfaces as $interface){
+	echo "<tr><td>{$interface[name]}</td><td>{$interface[mac]}</td><td>{$interface[ip]}/{$interface[netmask]}</td><td>{$interface[ipv6]}</td><td>{$interface[rx][errors]}/{$interface[tx][errors]}</td></tr> ";
+	} 
+	echo '</table><hr>';
 ?>
-		
+
 		<div class="row"><div class="col-md-6">
 		<h2> List of Wifi Networks</h2>
 		<?php

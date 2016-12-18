@@ -26,8 +26,9 @@ include_once("inc.header.php");
 	 <dt>OS:</dt><dd>A Debian based System</dd>
 	 <dt>Software:</dt><dd>We use some special Software, wireingPi, network-manager, git, </dd>
 	 <dt>Created by:</dt><dd>Ham Radio Operators, like DG9VH, DL3YK, DL5RFK</dd>
-	 <dt>Idear by:</dt><dd>DH6MBT</dd>
+	 <dt>Idear by:</dt><dd>DH6MBT, DL5RFK</dd>
 	 <dt>License:</dt><dd>GNU GPL v3</dd>
+	 <dt>Contact:</dt><dd>Visit http://www.bm262.de for more details.</dd>
 	</dl>
      
      <center>

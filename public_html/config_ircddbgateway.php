@@ -19,13 +19,9 @@ include_once('inc.header.php');
 if (isset($_SESSION['angemeldet'])){
 
 	$arr_config = getIRCDDBGATEWAYConfig();
-
-	echo "<pre>";
-	print_r($arr_config);
-	echo "</pre>";
-	
+	if ( PHPDEBUG == TRUE ){ echo "<pre>"; print_r($arr_config); echo "</pre>"; }
 ?>
-	<div class="container">
+   <div class="container">
     <div class="jumbotron">
       <h1>easyBM <small>ircddbgateway Configuration</small></h1>
 

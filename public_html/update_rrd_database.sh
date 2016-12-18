@@ -6,27 +6,25 @@
 #settings
 pcommand="/bin/ping -q -n -c 5"
 hosttoping="google.com"
-rrdbfile="/mnt/ramdisk/latency_db.rrd"
-
-#
+dbfile="/mnt/ramdisk/latency_db.rrd"
 #
 #
 /usr/bin/which gawk > /dev/null
-if [ $? -gt 0 ]; then 
+if [ $? -ne 0 ]; then 
  /usr/bin/apt install gawk
 fi
 gawk="/usr/bin/gawk"
 
 /usr/bin/which rrdtool > /dev/null
-if [ $? -gt 0 ]; then
+if [ $? -ne 0 ]; then
  /usr/bin/apt install rrdtool
 fi 
 rrdtool="/usr/bin/rrdtool"
 
 #initialize rrd database
-if [ ! -f "$rrdbfile" ]; then
- echo "Creating a RRD File at /mnt/ramdisk/"
- $rrdtool create $rrdbfile --step 180 \
+if [ ! -f "$dbfile" ]; then
+ echo "Creating a RRD File at /mnt/ramdisk/ for the latency testresult database"
+ $rrdtool create $dbfile --step 180 \
  DS:pl:GAUGE:550:0:100 \
  DS:rtt:GAUGE:550:0:10000000 \
  RRA:MAX:0.5:1:3360 \
@@ -53,10 +51,7 @@ get_data() {
  
 #change to the script directory
 cd /mnt/ramdisk/
- 
 #collect the data
 get_data $hosttoping
- 
 #update the database
-$rrdtool update $rrdbfile --template pl:rtt N:$RETURN_DATA
-
+$rrdtool update $dbfile --template pl:rtt N:$RETURN_DATA

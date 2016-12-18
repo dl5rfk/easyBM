@@ -92,10 +92,17 @@ if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Da
 
 <br />
 <h2>Internet Latency Graph</h2>
-<center><img src="/admin/latency_graph.png" class="img-responsive" alt="Latency Graph for your Internet Access"></center>
+<center><img src="/admin/latency_graph.png" class="img-responsive" alt="Latency Graph for your Internet Access"></center><br />
+<?php 
+  $printout=shell_exec('/usr/bin/rrdtool lastupdate /mnt/ramdisk/latency_db.rrd |grep ":"');
+  $timestamp=explode(':',$printout);
+  echo 'Last update: '.gmdate("Y-m-d\, H:i:s", $timestamp[0]);
+?>
 
-<br /> <br />
+<br /> 
 <p class="text-danger"><strong>Note:</strong>&nbsp;It is essential that you have access to the internet, otherwise this website will not work properly.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
 
 </div></div>
 

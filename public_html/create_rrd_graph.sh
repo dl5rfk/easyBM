@@ -1,15 +1,17 @@
 #!/bin/bash
+# by DL5RFK 
+# 
 
-if [ ! -L "/opt/easyBM/public_html/latency_graph.png" ];then 
- if [ -f "/mnt/ramdisk/latency_graph.png" ];then
+if [ ! -L "/opt/easyBM/public_html/latency_graph.png" ]; then 
+ if [ -f "/mnt/ramdisk/latency_graph.png" ]; then
  ln -s /mnt/ramdisk/latency_graph.png /opt/easyBM/public_html/latency_graph.png
  fi
 fi
 
 /usr/bin/rrdtool graph /mnt/ramdisk/latency_graph.png \
--w 945 -h 120 -a PNG \
+-w 965 -h 140 -a PNG \
 --slope-mode \
---start end-4days --end now \
+--start end-5days --end now \
 --font DEFAULT:7: \
 --title "Internet Ping Time (Target is Google)" \
 --watermark "`date`" \
@@ -37,3 +39,4 @@ AREA:PL10#FFFF00:"1-10%":STACK \
 AREA:PL25#FFCC00:"10-25%":STACK \
 AREA:PL50#FF8000:"25-50%":STACK \
 AREA:PL100#FF0000:"50-100%":STACK
+

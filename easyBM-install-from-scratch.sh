@@ -1,9 +1,15 @@
 #!/bin/bash 
+# by DL5RFK
+# it is created for internal use only
+# DO NOT USE THIS SCRIPT AS A NORMAL USER
+# THIS SCRIPT IS NOT SUPPORTED
+# if you have any suggestion, please contact us via www.bm262.de
+#
 
 #define functions
 function pause(){
  echo
- read -n1 -rsp $" Press space to continue or Ctrl+C to exit..."
+ read -n1 -rsp $" Check the previous printout and press space to continue or Ctrl+C to abort !"
  echo
 }
 
@@ -34,7 +40,7 @@ echo "*      FOR INTERNAL USE ONLY                   *"
 echo "************************************************"
 
 if [ ! $( id -u ) -eq 0 ]; then
-  echo "  ERROR: $0 Must be run as root, Script terminating" 1>&2; exit 7; 
+  echo "  ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 7; 
 fi
 
 # Checking root permissions
@@ -46,6 +52,15 @@ if [ ! -d "/opt/easyBM/" ]; then
   echo "  ERROR: $0 need source direcotry /opt/easyBM"; exit 7;
 fi
 
+if [ -d "/opt/MMDVMHost/" ]; then 
+ echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 7;
+fi
+
+if [ -d "/opt/YSFClients/" ]; then 
+ echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 7; 
+fi
+
+
 # Detect OS
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Debian)     type="debian" ;;
@@ -54,14 +69,14 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     *)          type="rhel" ;;
 esac
 
-echo -e "\n\n + first time update and upgrade\n"
+echo -e "\n\n + at first update and upgrade debian jessi\n"
 sudo apt update && sudo apt upgrade 
 check_result $? 'apt upgrade failed'
 
 pause
 
-echo -e "\n\n + installing Tools\n"
-sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp
+echo -e "\n\n + installing general Tools like git gcc make and more...\n"
+sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils
 
 # Checking wget
 if [ ! -e '/usr/bin/wget' ]; then
@@ -73,6 +88,13 @@ pause
 
 echo -e "\n\n + diable bluetooth\n"
 sudo bash -c 'echo "dtoverlay=pi3-disable-bt" >> /boot/config.txt'
+#
+ls /dev/ttyAMA0
+if [ $? -ne 0 ]; then
+  echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting....";
+	exit 1; 
+fi
+#
 sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service 
 echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
@@ -343,12 +365,13 @@ sudo update-rc.d YSFGateway enable
 pause
 
 echo -e "\n\n + copying files\n"
-sudo cp -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM.cronjob
+sudo cp -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 sudo cp -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
 sudo cp -f /opt/easyBM/files/.bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
 
 echo -e "\n\n + restarting services\n"
 sudo systemctl restart lighttpd
+sudo /etc/init.d/cron restart
 sudo systemctl restart cron
 
 pause 
