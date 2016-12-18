@@ -2,8 +2,7 @@
 #
 #by DL5RFK, use it as is....
 #
-#LAST CHANGE: 2016-11-15
-
+#LAST CHANGE: 2016-12-15
 
 /usr/bin/which apt
 if  [ $? -gt 0 ]; then 
@@ -36,8 +35,10 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119 by dl5rfk]" --menu
 63 " Update easyBM Scripts " \
 64 " Update MMDVMHost Software " \
 65 " Update MMDVMHost-Dashboard " \
+66 " Update YSFGateway Software " \
 71 " Turn off SWAP file " \
 72 " Turn off ttyAMA0 service " \
+81 " Backup all " \
 91 " Restart MMDVM " \
 92 " Restart ircddbgateway " \
 94 " Restart YFSGateway " \
@@ -51,7 +52,6 @@ if [ $exitstatus = 0 ]; then
 else
     echo "You chose Cancel. Have a nice day. "; break;
 fi
-
 
 case $choice in
 11) /usr/bin/sudo whiptail --title "IP Address" --msgbox "A list of all interfaces: \n\n `ip addr show`" 30 70;;
@@ -72,19 +72,19 @@ case $choice in
 63) 
 	clear
 	cd /opt/easyBM
-	git pull
+	/usr/bin/sudo /usr/bin/git pull
 	read -p " Update done, press [Enter] to continue..."
 	;;
 64) 
 	clear
 	if [ ! -d "/opt/MMDVMHost" ]; then 
-	  echo "Sorry, MMDVMHost directory not exists in /opt/ !" 
+	  echo "Sorry, MMDVMHost directory does not exists in /opt/ !" 
 	  exit 1;
 	fi
-	cd /opt/MMDVMHost/ && /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
-	/usr/bin/git pull
+	 cd /opt/MMDVMHost/ && /usr/bin/sudo /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
+	/usr/bin/sudo /usr/bin/git pull
 	if [ $? -eq 0 ]; then
-	  /usr/bin/make && /bin/systemctl stop mmdvmhost.service && /bin/systemctl start mmdvmhost.service
+	 /usr/bin/sudo /usr/bin/make && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
 	else 
 	  /usr/bin/sudo whiptail --title "ERROR" --msgbox "Update failed, sorry !\n\n Please try to update manualy " 30 70
 	fi
@@ -99,8 +99,71 @@ case $choice in
 	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;
+
+66)
+	clear
+	if [ ! -d "/opt/YSFClients/YSFGateway" ]; then
+          echo "Sorry, YSFGateway directory does not exists in /opt/YSFClients !"
+          exit 1;
+        fi
+	 cd /opt/YSFClients/YSFGateway/
+	/usr/bin/sudo /usr/bin/git pull
+	/usr/bin/sudo /usr/bin/make clean all
+	echo
+	echo "Old Version of YSFGateway is"
+	/usr/local/bin/YSFGateway --version
+	echo
+	/usr/bin/sudo /etc/init.d/ysfgateway stop
+	/usr/bin/sudo cp /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/YSFGateway
+	echo
+	echo "New Version of YSFGateway is"
+	/usr/local/bin/YSFGateway --version
+	echo 
+	/usr/bin/sudo /etc/init.de/ysfgateway start
+	
+	read -p " Update done, press [Enter] to continue..."
+;;
 71) /usr/bin/sudo dphys-swapfile swapoff; if [ $?=0 ]; then /usr/bin/sudo whiptail --title "SWAP File" --msgbox "\n\nNow swapping is off !\n\n" 30 70; fi;;
 72) /usr/bin/sudo systemctl stop serial-getty@ttyAMA0.service && /usr/bin/sudo systemctl disable serial-getty@ttyAMA0.service && /usr/bin/sudo whiptail --title "ttyAMA0 Status" --msgbox "Please check the file permissions, owner has to be root and the group has to be dailout.\n\n\ `ls -ls /dev/ttyAMA0`" 30 70;;
+81)
+	clear
+	if [ ! -d "/opt/backup" ]; then
+   	 /usr/bin/sudo /bin/mkdir /opt/backup
+	fi
+
+	if [-w /var/www/html/MMDVMHost-Dashboard/config/config.php ]; then
+	 /usr/bin/sudo /bin/cp /var/www/html/MMDVMHost-Dashboard/config/config.php /var/www/html/MMDVMHost-Dashboard/config/config.php.`/bin/date -I`
+	 /usr/bin/sudo /bin/cp /var/www/html/MMDVMHost-Dashboard/config/config.php.`/bin/date -I` /opt/backup
+	fi
+
+	if [ -w /opt/MMDVMHost/MMDVM.ini ]; then
+	 /usr/bin/sudo /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
+	 /usr/bin/sudo /bin/cp /opt/MMDVMHost/MMDVM.ini.`/bin/date -I` /opt/backup
+	fi
+
+	if [ -w /etc/YSFGateway/YSFGateway.ini ]; then
+	 /usr/bin/sudo /bin/cp /etc/YSFGateway/YSFGateway.ini /opt/backup/YSFGateway.ini.`/bin/date -I`
+	fi
+
+	if [ -w /etc/ircddbgateway ];then
+	 /usr/bin/sudo /bin/cp /etc/ircddbgateway /opt/backup/ircddbgateway.`/bin/date -I`
+	fi
+	
+	 /usr/bin/sudo /bin/tar -cvzf /opt/backup/easyBM-Backup-`date -I`.tar.gz /etc /opt/ /var/www/
+
+	echo
+	echo "DONE......................................................................."
+	echo
+	echo " YOU CAN FIND THE BACKUP FILE AT /opt/backup/easyBM-Backup-`date -I`.tar.gz"
+	echo " Please copy the .tar.gz file to your local backup-storage, now."
+	echo
+	echo "Content of your Backup directory: "
+	
+	ls -lsa /opt/backup/
+	echo 
+	echo
+	read -p " Backup done, press [Enter] to continue..."
+;;
 91) /usr/bin/sudo systemctl restart mmdvmhost.service;;
 92) /usr/bin/sudo systemctl restart ircddbgateway.service;;
 93) /usr/bin/sudo systemctl restart lighttpd.service;;

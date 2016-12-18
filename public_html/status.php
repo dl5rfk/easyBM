@@ -30,6 +30,45 @@ if (isset($_SESSION['angemeldet'])){
 
 <div class="container"><div class="row">
 
+<h1>Process Status</h1>
+<?php
+	if (isProcessRunning("MMDVMHost")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">MMDVMHost</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">MMDVMHost</button>&nbsp;';
+                                        }
+	if (isProcessRunning("ircddbgateway")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">ircddbgateway</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">ircddbgateway</button>&nbsp;';
+                                        }
+	if (isProcessRunning("YSFGateway")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">YSFGateway</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">YSFGateway</button>&nbsp;';
+                                        }
+	if (isProcessRunning("lighttpd")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">lighttpd</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">lighttpd</button>&nbsp;';
+                                        }
+	if (isProcessRunning("cron")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">crond</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">crond</button>&nbsp;';
+                                        }
+	if (isProcessRunning("ntpd")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">ntpd</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">ntpd</button>&nbsp;';
+                                        }
+	if (isProcessRunning("rsyslogd")) {
+                                                echo '<button type="button" class="btn btn-success" title="is running">rsyslogd</button>&nbsp;';
+                                        } else {
+                                                echo '<button type="button" class="btn btn-danger" title="Please check and start">rsyslogd</button>&nbsp;';
+                                        }
+?>
+
 <h1>System Status</h1>
 <?php
 if (!file_exists($MMDVMINI)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> MMDVM.ini is missing. </div></p>'; }

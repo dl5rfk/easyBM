@@ -23,6 +23,39 @@ if (isset($_SESSION['angemeldet'])){
   <div class="container">
     <div class="jumbotron">
       <h1>easyBM <small>under contruction</small></h1>
+
+
+<?php
+
+  $submask = exec("ifconfig eth0 | grep inet", $out);
+    $submask = str_ireplace("inet addr:", "", $submask);
+    $submask = str_ireplace("Mask:", "", $submask);
+    $submask = trim($submask);
+    $submask = explode(" ", $submask);
+   $ip_adress=$submask[0];
+   $mask=$submask[4];
+   
+   $gatewayType = shell_exec("route -n");
+   $gatewayTypeRaw = explode(" ", $gatewayType);
+   $gateway=$gatewayTypeRaw[42];
+   
+   $dnsType = file('/etc/resolv.conf');
+   $dnsType = str_ireplace("nameserver ", "", $dnsType);
+   $dns1 = $dnsType[2];
+   $dns2 = $dnsType[3];
+   $dns3 = $dnsType[4];
+
+   $hostname = GETHOSTNAME();
+
+	echo $submask;
+	echo $ip_adress;
+	echo $mask;
+	echo $gateway;
+	echo $dns1;
+	echo $dns2;
+	echo $dns3;
+	echo $hostname;
+?>
 		
 		<div class="row"><div class="col-md-6">
 		<h2> List of Wifi Networks</h2>

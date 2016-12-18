@@ -103,4 +103,17 @@ if($file)
   else
     return $str;
 }
+
+//
+function isProcessRunning($processname) {
+        exec("pgrep " . $processname, $pids);
+        if(empty($pids)) {
+                // process not running!
+                return false;
+        } else {
+                // process running!
+                return true;
+        }
+}
+
 ?>
