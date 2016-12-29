@@ -59,14 +59,6 @@ function getMMDVMConfig() {
         // loads into array for further use
         $conf = array();
         $conf = parse_ini_file(MMDVMINIPATH."/".MMDVMINIFILENAME,TRUE);
-        /*
-        if ($configs = fopen(MMDVMINIPATH."/".MMDVMINIFILENAME, 'r')) {	
-                while ($config = fgets($configs)) {
-                        array_push($conf, trim ( $config, " \t\n\r\0\x0B"));
-                }
-                fclose($configs);
-        }
-        */
         return $conf;
 }
 

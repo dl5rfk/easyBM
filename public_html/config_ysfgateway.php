@@ -88,6 +88,7 @@ Debug=1
             <span class="help-block">This is your own DMR ID.</span>
            </div>
           </div>
+	 <legend>Info</legend>
          <div class="form-group">
           <label class="col-md-4 control-label" for="location">Your Location</label>
             <div class="col-md-4">
@@ -108,7 +109,9 @@ Debug=1
              <span class="help-block">Let us know, where your are located.</span>
             </div>
          </div>
-
+	 <legend>Logging</legend>
+	 <legend>APRS</legend>
+	 <legend>Networking</legend>
 
 	</form>
 	</div> <!--/jumbotron-->
@@ -117,6 +120,7 @@ Debug=1
 <?php
  
 } else { echo pleaseLogin(); }
-include_once('inc.footer.php');
 
+
+include_once('inc.footer.php');
 ?>

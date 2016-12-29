@@ -5,7 +5,7 @@
 define("ADMINPASSWORD", "123456");
 define("ADMINPASSWORDCHANGED", TRUE);
 define("SETUPTIME","2016-11-27 22:30:39");
-define("PHPDEBUG", FALSE);
+define("PHPDEBUG", TRUE);
 define("LOGPATH", "/mnt/ramdisk/");
 define("MMDVMPATH", "/opt/MMDVMHost/");
 define("MMDVMINIPATH", "/opt/MMDVMHost/");

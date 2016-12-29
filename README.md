@@ -1,31 +1,26 @@
 # easyBM
 
-The SSD-Image includes a dashboard (MMDVMHost-Dashboard by DG9VH) and a web interface for configuration with the necessary personal data. This is done with your normal web browser, for example with your notebook. Therefore the RPi is connected with a network cable to your LAN and can be reached via the DHCP-assigned IP address.
-
-
 #What is easyBM ?
-It is our goal to allow every amateur radio operator setting up a personal DVMega hotspot within shortest time, by applying this easy to install image. So using digital voice communications is easily accomplished.
+It is our goal to allow every hamradio operator setting up a personal DVMega hotspot within shortest time, by applying this easy to install SD-Card image. So using digital voice communications is easily accomplished.
+The main focus is to build a SD-Image for the Raspberry Pi Hardware combined with the DVMega shield. Some of our scripts can be also used by an ordinary MMDVM-Repeater Setup, as well. 
 
-The main focus is to build a SSD-Image for the Raspberry Pi Hardware combined with the DVMega shield. Some of our scripts can be also used by an ordinary MMDVM-Repeater Setup, as well. 
-
-## Contact
-Please do not hesitiate to give us your feedback for improments or be a part of the development. see http://www.bm262.de
-
+## The Idea
+A SD-Image including a dashboard ( like MMDVMHost-Dashboard by DG9VH) and a web interface is everything you need to setup a DVMega Hotspot. Therefore you need an Raspberry RPi who is connected to your local network and can be reached via the DHCP-assigned IP address. Of course, the ip-adresse must first be determined with the help of your internet-router.
 
 ## How to install ?
 
-First of all, please use a SD-Card image. You can find it at our german website [http://www.bm262.de](http://www.bm262.de)
+Your can use  our prebuild SD-Card image. You can find it at our german website [http://www.bm262.de](http://www.bm262.de)
 But, if you think it is a good idea to build it step-by-step, you can clone from the repo.  
-On a fresh and clean Raspberry Pi Debian installation goto /opt and clone the repository from github. 
 
 ### Requirements
 * Raspbian jessie light Image [https://www.raspberrypi.org/downloads/raspbian/](Download page)
 * git
 * Linux basic skills
-* An up and running Raspberry Pi with Debian Jessi Light
+* And all together  up and running for the next step.
 
 ### Installation
-Login into the Raspberry and do the following steps:
+On a fresh and clean Raspberry Pi Debian Jessi light installation goto the directory /opt and clone the repository from github. 
+Login into the Raspberry with the default password "raspberry" and do the following steps:
 
 	apt install git 
 	cd /opt
@@ -33,10 +28,18 @@ Login into the Raspberry and do the following steps:
 	cd /opt/easyBM/
 	./easyBM-install-from-scratch.sh
 
-The script easyBM-install-from-scratch.sh does mostly all needed steps. But please be carefull.
+BUT, the script easyBM-install-from-scratch.sh does mostly do all the needed steps. Please be carefull, because this install script is still in development.
+
+## Contact
+Please do not hesitiate to give us your feedback for improvements or be a part of the development. see http://www.bm262.de
 
 ## Support or Development 
 For some discussion, please have a look at https://groups.yahoo.com/neo/groups/easybm/info
+
+## Special Thanks
+- A special thanks to DG9VH who has build the [MMDVMHost-Dashboard](https://github.com/dg9vh/) which was a great inspiration and example for this project.
+- A special thanks to 
+
 
 ##Licence
 Distributed under the GNU General Public License version 3 or later
