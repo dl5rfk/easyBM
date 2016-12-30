@@ -163,7 +163,6 @@ if [ ! -e '/usr/sbin/ntpdate' ]; then
     check_result $? "  Sorry, can't install ntpdate. Please install it."
 fi
 
-
 pause
 
 echo -e "\n\n + diable bluetooth\n"
@@ -174,8 +173,10 @@ fi
 #AMA0 DVMega 
 ls /dev/ttyAMA0
 if [ $? -ne 0 ]; then
-  echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting....";
-  exit 1; 
+  echo " *********************************************"
+  echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting...."
+  echo "  DVMega uses ttyAMA0, think a about it......."
+  echo " *********************************************"
 else 
   sudo systemctl stop serial-getty@ttyAMA0.service
   sudo systemctl disable serial-getty@ttyAMA0.service
@@ -183,7 +184,6 @@ else
   ls -ls /dev/ttyAMA0
 fi
 #
-
 echo -e "\n\n FIXME: Add group dailout and change owner to root:dailout\n"
 
 pause
