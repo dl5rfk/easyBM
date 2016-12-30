@@ -35,8 +35,6 @@ check_result() {
 clear
 echo 
 echo 
-echo
-echo 
 echo " Installing ....................... "
 echo "                       ____  __  __ "
 echo "   ___  __ _ ___ _   _| __ )|  \/  |"
@@ -45,23 +43,31 @@ echo " |  __/ (_| \__ \ |_| | |_) | |  | |"
 echo "  \___|\__,_|___/\__| |____/|_|  |_|"
 echo "                 |___/              "
 echo 
-echo " easyBM is based on an idear of the"
-echo " German BrandMeister Support-Team  "
+echo "  easyBM is based on an idear of the"
+echo "  German BrandMeister Support-Team  "
 echo 
-echo " Licenced under the GNU Licence " 
+echo "  Licenced under the GNU Licence " 
 echo "************************************************"
-echo "*      FOR INTERNAL USE ONLY                   *"
+echo "*            FOR INTERNAL USE ONLY             *"
 echo "************************************************"
 echo
-echo " I found.... $arch"
-echo " I found.... $release"
-echo " I found.... $codename"
-echo " You have... $memory free"
+echo " I found.... $arch "
+echo " I found.... $release as OS Release"
+echo " I found.... $codename as Codename"
+echo " You have... $memory KB Memory"
+echo
+echo " Please relax and watch the screen.............."
+echo
 echo
 echo
 pause
 
-echo "  Some first checks ...."
+echo "  +++ Some first checks ...."
+sleep 1
+echo "  ."
+sleep 1
+echo "  ."
+sleep 1
 if [ ! $( id -u ) -eq 0 ]; then
   echo "  ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
 fi
@@ -99,6 +105,9 @@ if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
     #echo "Example: bash $0 --force"
     exit 1
 fi
+# Check Internet Access
+ping -c 3 google.com
+check_result $? '  ERROR, please make sure the Internet is reachable !!!'
 # dedect os
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Debian)     ostype="debian" ;;
@@ -106,17 +115,20 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Raspbian)   ostype="raspbian" ;;
     *)          ostype="rhel" ;;
 esac
-echo "  Great, we can continue...."
+echo "  ."
+sleep 1
+echo "  ."
+sleep 1
+echo "  +++ Great, we can continue...."
 pause
 
-echo -e "\n\n + at first, update and upgrade debian jessie\n"
+echo -e "\n\n +++ Update and Upgrade debian jessie light\n"
 sudo apt update && sudo apt upgrade 
 check_result $? ' Sorry,..... apt upgrade failed'
-
 pause
 
-echo -e "\n\n + installing some Tools, like git gcc make vim wget and more...\n"
-sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils screenfetch
+echo -e "\n\n +++ installing some Tools, like git gcc make vim wget and more...\n"
+sudo apt install build-essential git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils screenfetch
 
 # Check wget
 if [ ! -e '/usr/bin/wget' ]; then
@@ -166,7 +178,7 @@ fi
 
 pause
 
-echo -e "\n\n + diable bluetooth\n"
+echo -e "\n\n +++ disabling  bluetooth\n"
 grep -i 'dtoverlay=pi3-disable-bt' /boot/config.txt
 if [ $? -gt 0 ]; then 
   sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
@@ -175,7 +187,7 @@ fi
 ls /dev/ttyAMA0
 if [ $? -ne 0 ]; then
   echo " *********************************************"
-  echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting...."
+  echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! "
   echo "  DVMega uses ttyAMA0, think a about it......."
   echo " *********************************************"
 else 
@@ -183,13 +195,15 @@ else
   sudo systemctl disable serial-getty@ttyAMA0.service
   echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
   ls -ls /dev/ttyAMA0
+  echo " looks like:"
+  echo "crw-rw---T 1 root dialout 204, 64 Mar 10 13:47 /dev/ttyAMA0"
+  echo "sudo usermod –a –G dialout <username>"
 fi
 #
-echo -e "\n\n FIXME: Add group dailout and change owner to root:dailout\n"
 
 pause
 
-echo -e "\n\n + installing NTP\n"
+echo -e "\n\n +++ installing NTP\n"
 sudo apt install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl start ntp
 # NTP Synchronization
 echo '#!/bin/sh' > /etc/cron.daily/ntpdate
@@ -199,17 +213,23 @@ ntpdate -s pool.ntp.org
 
 pause
 
-echo -e "\n\n + installing ramdisk\n" 
+echo -e "\n\n +++ installing ramdisk\n" 
 sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
-##FIXME, checken ob es schon dirn steht##
-echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=64M 0 0" >> /etc/fstab
-mount -a
-echo -e "\n\n + now, check if ramdrive has 64MB\n\n"
-df -h
+grep ramdisk /etc/fstab
+if [ $? -gt 0 ]; then
+  echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=64M 0 0" >> /etc/fstab
+  mount -a
+  echo -e "\n\n +++ now, check if ramdrive has 64MB\n\n"
+  df -h /mnt/ramdisk
+else
+  echo -e "\n\n +++ Found ramdisk in fstab, OK. Continue....\n"
+  echo -e "\n\n +++ now, check if ramdrive has 64MB\n\n"
+  df -h /mnt/ramdisk
+fi
 
 pause
 
-echo -e "\n\n + installing Webserver lighttpd\n"
+echo -e "\n\n +++ installing Webserver lighttpd\n"
 sudo apt install lighttpd php5-common php5-cgi php5
 sudo lighty-enable-mod fastcgi
 sudo lighty-enable-mod fastcgi-php
@@ -217,46 +237,59 @@ sudo service lighttpd restart
 sudo rm /var/www/html/index.html
 sudo rm /var/www/html/index.lighttpd.html
 sudo usermod -a -G www-data pi
+## FIXME gpio gibts noch garnicht
 sudo usermod -a -G gpio www-data
 ## FIXME, checken ob es schon drin steht##
+## evtl mit sed
 echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
 
 pause 
 
-echo -e "\n\n + installing and updating wiringPi\n"
+echo -e "\n\n +++ installing and updating wiringPi\n"
 if [ ! -d "/opt/wiringPi/" ]; then
  cd /opt/
  git clone git://git.drogon.net/wiringPi
+ cd /opt/wiringPi
+ sudo git pull origin
+ /opt/wiringPi/build
+ if [ $? -gt 0 ]; then
+    echo -e "\n\n ERROR, can not build wiringPi. Please check.....\n"
+ fi 
 else 
  cd /opt/wiringPi
- git pull origin
+ sudo git pull origin
+ /opt/wiringPi/build
+ if [ $? -gt 0 ]; then
+    echo -e "\n\n ERROR, can not build wiringPi. Please check.....\n"
+ fi 
 fi
-bash -c '/opt/wiringPi/build'
+echo -e "\n\n +++ Please check the wiringPi printout...\n"
 gpio -v
 gpio readall
 
 pause
 
-echo -e "\n\n + installing MMDVMCal\n"
+echo -e "\n\n +++ installing MMDVMCal\n"
 cd /opt
 sudo git clone https://github.com/g4klx/MMDVMCal.git
-sudo cd /opt/MMDVMCal
-sudo make
+cd /opt/MMDVMCal
+sudo make all
 
 pause
 
-echo -e "\n\n + installing MMDVMHost\n"
+echo -e "\n\n +++ installing MMDVMHost\n"
 cd /opt
 sudo git clone https://github.com/g4klx/MMDVMHost.git
 cd /opt/MMDVMHost
-sudo make clean
-sudo make
+sudo make clean all
+echo
 sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
+echo
 sudo cp -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.origin
 
 pause
 
-echo -e "\n\n + installing systemd Service for MMDVMHost\n"
+echo -e "\n\n +++ installing systemd Service MMDVM Host Service\n"
 echo " 
 [Unit]
 Description=MMDVM Host Service
@@ -278,7 +311,7 @@ sudo ln -s /lib/systemd/system/mmdvmhost.service /etc/systemd/system/mmdvmhost.s
 
 pause
 
-echo -e "\n\n + installing systemd Timer for MMDVMHost\n"
+echo -e "\n\n +++ installing systemd Timer for MMDVMHost\n"
 echo "
 [Timer]
 OnStartupSec=60
@@ -295,19 +328,22 @@ sudo systemctl enable mmdvmhost.timer
 
 pause 
 
-echo -e "\n\n + installing MMDVMHost-Dashboard\n"
+echo -e "\n\n +++ installing MMDVMHost-Dashboard\n"
 cd /var/www/html/
 sudo git clone https://github.com/dg9vh/MMDVMHost-Dashboard.git 
 sudo chown -Rv www-data:www-data /var/www/html/MMDVMHost-Dashboard/*
 sudo mv /var/www/html/MMDVMHost-Dashboard/setup.php /var/www/html/MMDVMHost-Dashboard/dashboard.setup.php
 
-
 pause
 
-echo -e "\n\n + installing ircddbgateway\n"
+##FIXME FIXME 
+echo -e "\n\n +++ installing ircddbgateway\n"
 cd /tmp
 wget http://repo1.ham-digital.net/debian/dl5di.pk 
+check_result $? '  ERROR, can not download dl5di key for adding to apt !!!'
 sudo apt-key add dl5di.pk     
+check_result $? '  ERROR, can not add dl5di apt-key !!!'
+
 ##FIXME, das repo ist veraltet, ein neues liegt in files##
 sudo curl http://repo1.ham-digital.net/raspbian/opendv.list -o /etc/apt/sources.list.d/opendv.list
 sudo apt update && sudo apt upgrade && sudo apt install ircddbgateway
@@ -333,14 +369,13 @@ sudo echo "<?php header('Location: ircddbgateway.php'); ?>" > /var/www/html/ircd
 sudo chown -R www-data:www-data /var/www/html/ircddbgateway/
 ln -s var/www/html/ircddbgateway/ircddblocal.php /var/www/html/ircddblocal.php
 
-
 ls -lsa /etc/ircddbgateway
 ls -lsa /home/opendv/ircddbgateway/ircddbgateway
 chmod 666 /home/opendv/ircddbgateway/ircddbgateway
 
 pause 
 
-echo -e "\n\n + installing C4FM YSF Software\n"
+echo -e "\n\n +++ installing C4FM YSF Software\n"
 cd /opt
 git clone https://github.com/g4klx/YSFClients.git
 cd /opt/YSFClients/YSFGateway
@@ -449,7 +484,7 @@ sudo update-rc.d YSFGateway enable
 
 pause
 
-echo -e "\n\n + copying files\n"
+echo -e "\n\n +++ copying files\n"
 sudo cp -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 sudo cp -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
 sudo cp -f /opt/easyBM/files/.bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
