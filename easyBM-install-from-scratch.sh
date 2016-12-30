@@ -32,7 +32,6 @@ check_result() {
 #
 #START 
 #
-
 clear
 echo 
 echo 
@@ -52,6 +51,11 @@ echo
 echo "************************************************"
 echo "*      FOR INTERNAL USE ONLY                   *"
 echo "************************************************"
+echo
+echo " I found.... $arch"
+echo " I found.... $release"
+echo " I found.... $codename"
+echo " You have... $memory free"
 echo
 echo
 pause
