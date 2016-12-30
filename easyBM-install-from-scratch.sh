@@ -37,7 +37,7 @@ echo
 echo 
 echo
 echo 
-echo " Installing .......... "
+echo " Installing ....................... "
 echo "                       ____  __  __ "
 echo "   ___  __ _ ___ _   _| __ )|  \/  |"
 echo "  / _ \/ _  / __| | | |  _ \| |\/| |"
@@ -46,8 +46,9 @@ echo "  \___|\__,_|___/\__| |____/|_|  |_|"
 echo "                 |___/              "
 echo 
 echo " easyBM is based on an idear of the"
-echo " German BrandMeister Team, a hamradio Group "
+echo " German BrandMeister Support-Team  "
 echo 
+echo " Licenced under the GNU Licence " 
 echo "************************************************"
 echo "*      FOR INTERNAL USE ONLY                   *"
 echo "************************************************"
@@ -115,7 +116,7 @@ check_result $? ' Sorry,..... apt upgrade failed'
 pause
 
 echo -e "\n\n + installing some Tools, like git gcc make vim wget and more...\n"
-sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils
+sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils screenfetch
 
 # Check wget
 if [ ! -e '/usr/bin/wget' ]; then
@@ -499,6 +500,7 @@ echo -e "\n\n + Disk usage\n"
 df -h 
 echo -e "\n\n + ALL DONE ......\n" 
 echo 
+screenfetch
 echo 
 echo
 echo -e "Congratulations, you have just successfully installed \
