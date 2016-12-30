@@ -6,7 +6,15 @@
 # if you have any suggestion, please contact us via www.bm262.de
 #
 
-#define functions
+# Define Variables
+export PATH=$PATH:/sbin
+export DEBIAN_FRONTEND=noninteractive
+memory=$(grep 'MemTotal' /proc/meminfo |tr ' ' '\n' |grep [0-9])
+arch=$(uname -i)
+release=$(cat /etc/debian_version|grep -o [0-9]|head -n1)
+codename="$(cat /etc/os-release |grep VERSION= |cut -f 2 -d \(|cut -f 1 -d \))"
+
+# Define functions
 function pause(){
  echo
  read -n1 -rsp $" Check the previous printout and press space to continue or Ctrl+C to abort !"
@@ -20,6 +28,10 @@ check_result() {
         exit $1
     fi
 }
+
+#
+#START 
+#
 
 clear
 echo 
@@ -84,10 +96,10 @@ if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
 fi
 # dedect os
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
-    Debian)     type="debian" ;;
-    Ubuntu)     type="ubuntu" ;;
-    Raspbian)   type="raspbian" ;;
-    *)          type="rhel" ;;
+    Debian)     ostype="debian" ;;
+    Ubuntu)     ostype="ubuntu" ;;
+    Raspbian)   ostype="raspbian" ;;
+    *)          ostype="rhel" ;;
 esac
 echo "  Great, we can continue...."
 pause
@@ -141,18 +153,25 @@ if [ ! -e '/usr/bin/g++' ]; then
     apt-get -y install g++
     check_result $? "  Sorry, can't install g++. Please install it."
 fi
+# Check ntpdate
+if [ ! -e '/usr/sbin/ntpdate' ]; then
+    apt-get -y install ntpdate
+    check_result $? "  Sorry, can't install ntpdate. Please install it."
+fi
 
 
 pause
 
 echo -e "\n\n + diable bluetooth\n"
-sudo bash -c 'echo "dtoverlay=pi3-disable-bt" >> /boot/config.txt'
-#
+grep -i 'dtoverlay=pi3-disable-bt' /boot/config.txt
+if [ $? -gt 0 ]; then 
+  sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
+fi
+#AMA0 DVMega 
 ls /dev/ttyAMA0
 if [ $? -ne 0 ]; then
   echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting....";
   exit 1; 
-
 else 
   sudo systemctl stop serial-getty@ttyAMA0.service
   sudo systemctl disable serial-getty@ttyAMA0.service
