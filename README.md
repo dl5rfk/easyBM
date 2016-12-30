@@ -22,13 +22,17 @@ But, if you think it is a good idea to build it step-by-step, you can clone from
 On a fresh and clean Raspberry Pi Debian Jessi light installation goto the directory /opt and clone the repository from github. 
 Login into the Raspberry with the default password "raspberry" and do the following steps:
 
-	apt install git 
+	sudo -i
+	# do the following steps as user root, you can use the command sudo  
+	sudo apt install git 
 	cd /opt
-	git clone https://github.com/dl5rfk/easyBM.git
+	sudo git clone https://github.com/dl5rfk/easyBM.git
 	cd /opt/easyBM/
-	./easyBM-install-from-scratch.sh
+	sudo chmod 755 /opt/easyBM/easyBM-install-from-scratch.sh
+	sudo /opt/easyBM/easyBM-install-from-scratch.sh
+	# now follow the description
 
-BUT, the script easyBM-install-from-scratch.sh does mostly do all the needed steps. Please be carefull, because this install script is still in development.
+BUT NOTICE, the script easyBM-install-from-scratch.sh does mostly all the needed steps. Please be carefull, because this install script is still in development. Of course your can help to improve easyBM. 
 
 ## Contact
 Please do not hesitiate to give us your feedback for improvements or be a part of the development. see http://www.bm262.de

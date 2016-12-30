@@ -73,7 +73,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">easyBM</a>
+      <a class="navbar-brand" href="#">easyBM <small>(<?php echo $_SERVER['SERVER_ADDR'];?>)</small></a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">

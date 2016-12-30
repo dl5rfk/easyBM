@@ -34,55 +34,114 @@ echo " |  __/ (_| \__ \ |_| | |_) | |  | |"
 echo "  \___|\__,_|___/\__| |____/|_|  |_|"
 echo "                 |___/              "
 echo 
+echo " easyBM is based on an idear of the"
+echo " German BrandMeister Team, a hamradio Group "
 echo 
 echo "************************************************"
 echo "*      FOR INTERNAL USE ONLY                   *"
 echo "************************************************"
+echo
+echo
+pause
 
+echo "  Some first checks ...."
 if [ ! $( id -u ) -eq 0 ]; then
-  echo "  ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 7; 
+  echo "  ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
 fi
-
 # Checking root permissions
 if [ "x$(id -u)" != 'x0' ]; then
     check_error 1 "Script can be run executed only by root"
 fi
-
+# check directory
 if [ ! -d "/opt/easyBM/" ]; then
-  echo "  ERROR: $0 need source direcotry /opt/easyBM"; exit 7;
+  echo "  ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
 fi
-
+# check directory
 if [ -d "/opt/MMDVMHost/" ]; then 
- echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 7;
+ echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 1;
 fi
-
+# check directory
 if [ -d "/opt/YSFClients/" ]; then 
- echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 7; 
+ echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 1; 
 fi
-
-
-# Detect OS
+# Check easybm user account
+if [ ! -z "$(grep ^easybm: /etc/passwd)" ] && [ -z "$1" ]; then
+    echo "  ERROR: user easybm exists"
+    echo
+    echo 'Please remove easybm user account before proceeding.'
+    #echo 'If you want to do it automatically run installer with -f option:'
+    #echo "Example: bash $0 --force"
+    exit 1
+fi
+# Check easybm group account
+if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
+    echo "  ERROR: group easybm exists"
+    echo
+    echo 'Please remove easybm group before proceeding.'
+    #echo 'If you want to do it automatically run installer with -f option:'
+    #echo "Example: bash $0 --force"
+    exit 1
+fi
+# dedect os
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Debian)     type="debian" ;;
     Ubuntu)     type="ubuntu" ;;
     Raspbian)   type="raspbian" ;;
     *)          type="rhel" ;;
 esac
+echo "  Great, we can continue...."
+pause
 
-echo -e "\n\n + at first update and upgrade debian jessi\n"
+echo -e "\n\n + at first, update and upgrade debian jessie\n"
 sudo apt update && sudo apt upgrade 
-check_result $? 'apt upgrade failed'
+check_result $? ' Sorry,..... apt upgrade failed'
 
 pause
 
-echo -e "\n\n + installing general Tools like git gcc make and more...\n"
+echo -e "\n\n + installing some Tools, like git gcc make vim wget and more...\n"
 sudo apt install git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils
 
-# Checking wget
+# Check wget
 if [ ! -e '/usr/bin/wget' ]; then
     apt-get -y install wget
-    check_result $? "Can't install wget"
+    check_result $? "  Sorry, can't install wget. Please install it."
 fi
+# Check make
+if [ ! -e '/usr/bin/make' ]; then
+    apt-get -y install make
+    check_result $? "  Sorry, can't install make. Please install it."
+fi
+# Check screen
+if [ ! -e '/usr/bin/make' ]; then
+    apt-get -y install screen
+    check_result $? "  Sorry, can't install screen. Please install it."
+fi
+# Check curl
+if [ ! -e '/usr/bin/curl' ]; then
+    apt-get -y install curl
+    check_result $? "  Sorry, can't install curl. Please install it."
+fi
+# Check whiptail 
+if [ ! -e '/usr/bin/whiptail' ]; then
+    apt-get -y install whiptail
+    check_result $? "  Sorry, can't install whiptail. Please install it."
+fi
+# Check nano
+if [ ! -e '/usr/bin/nano' ]; then
+    apt-get -y install nano
+    check_result $? "  Sorry, can't install nano. Please install it."
+fi
+# Check gcc
+if [ ! -e '/usr/bin/gcc' ]; then
+    apt-get -y install gcc
+    check_result $? "  Sorry, can't install gcc. Please install it."
+fi 
+# Check g++
+if [ ! -e '/usr/bin/g++' ]; then
+    apt-get -y install g++
+    check_result $? "  Sorry, can't install g++. Please install it."
+fi
+
 
 pause
 
@@ -92,15 +151,17 @@ sudo bash -c 'echo "dtoverlay=pi3-disable-bt" >> /boot/config.txt'
 ls /dev/ttyAMA0
 if [ $? -ne 0 ]; then
   echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! Aborting....";
-	exit 1; 
+  exit 1; 
+
+else 
+  sudo systemctl stop serial-getty@ttyAMA0.service
+  sudo systemctl disable serial-getty@ttyAMA0.service
+  echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
+  ls -ls /dev/ttyAMA0
 fi
 #
-sudo systemctl stop serial-getty@ttyAMA0.service
-sudo systemctl disable serial-getty@ttyAMA0.service 
-echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
-ls -ls /dev/ttyAMA0
 
-echo -e "\n\n Add group dailout and change owner to root:dailout\n"
+echo -e "\n\n FIXME: Add group dailout and change owner to root:dailout\n"
 
 pause
 
