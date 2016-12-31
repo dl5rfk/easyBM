@@ -23,9 +23,13 @@ echo "Fetching Reflector files ... Done!"
 
 if [ -f /home/opendv/data/DPlus_Hosts.txt ]
  then
- echo „Going to restart ircDDBgateway, please wait ... “
+  {
+    for ((i = 0 ; i <= 100 ; i+=5)); do
+        sleep 0.1
+        echo $i
+    done
+  } | whiptail --gauge "Please wait while we are restarting ircddbgateway..." 6 50 0
  service ircddbgateway restart
- echo „Restart of ircDDBGateway ... Done!“
 else
  echo „Sorry, list of Reflectors NOT updated !!!“
 fi

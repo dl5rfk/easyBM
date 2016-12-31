@@ -348,6 +348,8 @@ check_result $? '  ERROR, can not add dl5di apt-key !!!'
 sudo curl http://repo1.ham-digital.net/raspbian/opendv.list -o /etc/apt/sources.list.d/opendv.list
 sudo apt update && sudo apt upgrade && sudo apt install ircddbgateway
 
+echo -e "\n\n  +++ Please keep in mind to use the command 'sudo ircddbgw_conf' for configuration' "
+
 #Passe die Pfade an, z.B. auf /mnt/ramdisk/opendv
 # vim /etc/default/ircddbgateway
 # vim /var/www/html/ircddbgateway/ircddblocal.php 
@@ -371,13 +373,13 @@ ln -s var/www/html/ircddbgateway/ircddblocal.php /var/www/html/ircddblocal.php
 
 ls -lsa /etc/ircddbgateway
 ls -lsa /home/opendv/ircddbgateway/ircddbgateway
-chmod 666 /home/opendv/ircddbgateway/ircddbgateway
+sudo chmod 666 /home/opendv/ircddbgateway/ircddbgateway
 
 pause 
 
 echo -e "\n\n +++ installing C4FM YSF Software\n"
 cd /opt
-git clone https://github.com/g4klx/YSFClients.git
+sudo git clone https://github.com/g4klx/YSFClients.git
 cd /opt/YSFClients/YSFGateway
 make clean all
 sudo cp /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
@@ -529,10 +531,7 @@ Version `date -I` is ready to start......
 
 " > /etc/motd
 
-pause
 
-echo -e "\n\n + Disk usage\n"
-df -h 
 echo -e "\n\n + ALL DONE ......\n" 
 echo 
 screenfetch
@@ -546,7 +545,6 @@ We hope that you enjoy your installation of easyBM. Please \
 feel free to contact us anytime if you have any questions.
 Thank you.
 
---
 Sincerely yours
 bm262.de team
 "

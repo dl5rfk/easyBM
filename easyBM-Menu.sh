@@ -6,29 +6,31 @@
 
 /usr/bin/which apt
 if  [ $? -gt 0 ]; then 
-	echo "Sorry, please install 'apt' !"
+	echo "Sorry, 'apt' not found ! ... is this a Debian OS ?"
 	exit 1;
 fi 
 /usr/bin/which git
 if  [ $? -gt 0 ]; then 
-	echo "Sorry, please install 'git' !"
+	echo "Sorry, please install 'git' !....OK"
 	apt install git
 fi 
 /usr/bin/which whiptail
 if  [ $? -gt 0 ]; then
-        echo "Sorry, please install 'whiptail' !"
+        echo "Sorry, please install 'whiptail' !...OK"
         apt install whiptail
 fi
 
 while : ; do
-choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119 by dl5rfk]" --menu "\n\nPlease select:\n" 30 70 20 \
+choice=$(whiptail --title "easyBM Service Menu [Ver. 20161219 by dl5rfk]" --menu "\n\nPlease select:\n" 25 70 15 \
 11 " Show IP-Addresses of this host " \
 12 " Show todays MMDVMHost Logfile " \
+13 " Show todays YSFGateway Logfile " \
 21 " Edit Network 'interfaces' configuration file " \
 22 " Edit 'MMDVM.ini' configuration file " \
 23 " Edit 'ircddbgateway' configuration file " \
 24 " Edit easyBM Cronjobs " \
 25 " Edit YFSGateway configuration file " \
+26 " Edit WLAN configuration file " \
 41 " Set File Permission of MMDVM.ini file " \
 61 " Update D-Star Reflektor list " \
 62 " Update RPi Operating System " \
@@ -41,8 +43,9 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20161119 by dl5rfk]" --menu
 81 " Backup all " \
 91 " Restart MMDVM " \
 92 " Restart ircddbgateway " \
-94 " Restart YFSGateway " \
 93 " Restart Webserver lighttpd " \
+94 " Restart YFSGateway " \
+95 " Restart cron Deamon " \
 98 " Reboot System" \
 99 " Exit this menu "  3>&1 1>&2 2>&3)
 
@@ -54,14 +57,15 @@ else
 fi
 
 case $choice in
-11) /usr/bin/sudo whiptail --title "IP Address" --msgbox "A list of all interfaces: \n\n `ip addr show`" 30 70;;
-12) /usr/bin/sudo /usr/bin/less /mnt/ramdisk/MMDVM-`date -I`.log;;
-21) [ -w "/etc/network/interfaces" ] && /usr/bin/sudo /usr/bin/nano /etc/network/interfaces || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
-22) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && /usr/bin/sudo /usr/bin/nano /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
-23) [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
-24) [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
-25) [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found"; sleep 15) ;;
-41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait..."; sleep 15) ;;
+11) /usr/bin/sudo whiptail --title "IP Address" --msgbox "A list of all interfaces: \n\n `ip addr show`" 25 70;;
+12) [ -w "/mnt/ramdisk/MMDVM-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/MMDVM-`date -I`.log || (echo "  Sorry, file not found! Please wait 10 seconds..."; sleep 10);;
+13) [ -w "/mnt/ramdisk/YFSGateway-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/YFSGateway-`date -I`.log || (echo "  Sorry, file not found! Please wait 10 seconds..."; sleep 10);;
+21) [ -w "/etc/network/interfaces" ] && /usr/bin/sudo /usr/bin/nano /etc/network/interfaces || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+22) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && /usr/bin/sudo /usr/bin/nano /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+23) [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+24) [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+25) [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
 61) /opt/easyBM/easyBM-Update-DStar-Hostfiles.sh ;;
 62) 
 	clear
@@ -86,7 +90,7 @@ case $choice in
 	if [ $? -eq 0 ]; then
 	 /usr/bin/sudo /usr/bin/make && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
 	else 
-	  /usr/bin/sudo whiptail --title "ERROR" --msgbox "Update failed, sorry !\n\n Please try to update manualy " 30 70
+	  /usr/bin/sudo whiptail --title "ERROR" --msgbox "Update failed, sorry !\n\n Please try to update manualy " 25 70
 	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;
@@ -164,11 +168,12 @@ case $choice in
 	echo
 	read -p " Backup done, press [Enter] to continue..."
 ;;
-91) /usr/bin/sudo systemctl restart mmdvmhost.service;;
-92) /usr/bin/sudo systemctl restart ircddbgateway.service;;
-93) /usr/bin/sudo systemctl restart lighttpd.service;;
+91) clear; /usr/bin/sudo systemctl restart mmdvmhost.service && /usr/bin/sudo systemctl status mmdvmhost.service; read -p " Restart done, press [Enter] to continue...";;
+92) clear; /usr/bin/sudo systemctl restart ircddbgateway.service; read -p " Restart done, press [Enter] to continue...";;
+93) clear; /usr/bin/sudo systemctl restart lighttpd.service && /usr/bin/sudo systemctl status lighttpd.service; read -p " Restart done, press [Enter] to continue...";;
 94) echo "Sorry, under construction";;
-98) /usr/bin/sudo reboot;;
+95) clear; /usr/bin/sudo systemctl restart cron.service; read -p " Restart done, press [Enter] to continue...";;
+98) clear; /usr/bin/sudo reboot;;
 99) /bin/cat /etc/motd && exit;;
 esac
 
