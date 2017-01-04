@@ -285,7 +285,7 @@ sudo make clean all
 echo
 sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
 echo
-sudo cp -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.origin
+sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.origin
 
 pause
 
@@ -487,9 +487,15 @@ sudo update-rc.d YSFGateway enable
 pause
 
 echo -e "\n\n +++ copying files\n"
-sudo cp -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
-sudo cp -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
-sudo cp -f /opt/easyBM/files/.bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
+sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
+sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
+sudo cp -b -f /opt/easyBM/files/.bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
+sudo cp -b -f /opt/easyBM/files/ircddbgateway.default /etc/default/ircddbgateway
+
+echo -e "\n\n +++ editing some files\n"
+#sed -i -e '$i \nohup sh /opt/easyBM/easyBM-send-startup-info.sh\n' rc.local
+
+
 
 echo -e "\n\n + restarting services\n"
 sudo systemctl restart lighttpd

@@ -5,7 +5,7 @@
 MAILTO=root
 #
 # Sende Info eMail at Startup
-@reboot /opt/easyBM/easyBM-send-startup-info.sh > /dev/null 2>&1
+@reboot root /opt/easyBM/easyBM-send-startup-info.sh > /dev/null 2>&1
 #Restart MMDVMHost daily at 00:00
 #0 0 * * * root /bin/systemctl restart mmdvmhost.service >/dev/null 2>&1
 #update ping database
@@ -20,6 +20,6 @@ MAILTO=root
 # check if process is there
 */10 * * * * root /usr/bin/pgrep ircddbgatewayd || /etc/init.d/ircddbgateway start > /dev/null 2>&1
 # check if process is there
-*/10 * * * * root /usr/bin/pgrep MMDVM || /bin/systemctl restart mmdvmhost.service > /dev/null 2>&1
+*/10 * * * * root /usr/bin/pgrep MMDVMHost || /bin/systemctl restart mmdvmhost.service > /dev/null 2>&1
 # check if process is there
-#*/10 * * * * root /usr/bin/pgrep ircddbgatewayd || /etc/init.d/ircddbgateway start >/dev/null 2>&1
+*/10 * * * * root /usr/bin/pgrep YSFGateway || /etc/init.d/ysfgateway start >/dev/null 2>&1

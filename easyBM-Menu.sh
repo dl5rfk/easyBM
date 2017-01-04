@@ -31,6 +31,7 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20161219 by dl5rfk]" --menu
 24 " Edit easyBM Cronjobs " \
 25 " Edit YFSGateway configuration file " \
 26 " Edit WLAN configuration file " \
+31 " Configuration ircddbgw " \
 41 " Set File Permission of MMDVM.ini file " \
 61 " Update D-Star Reflektor list " \
 62 " Update RPi Operating System " \
@@ -65,6 +66,7 @@ case $choice in
 23) [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
 24) [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
 25) [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
+31) [ -x "/usr/bin/ircddbgw_conf" ] && /usr/bin/ircddbgw_conf || (echo "Sorry, programm not found! Please wait 10 seconds..."; sleep 10) ;;
 41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait 10 seconds..."; sleep 10) ;;
 61) /opt/easyBM/easyBM-Update-DStar-Hostfiles.sh ;;
 62) 
