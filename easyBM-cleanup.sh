@@ -5,7 +5,7 @@
 #  USE THIS SCRIPT TO CLEANUP BEFOR YOU MAKE AN SSD-IMAGE
 #   (for internal use only)
 #
-#LAST CHANGE: 2016-11-09
+#LAST CHANGE: 2016-12-09
 
 #should be root:dailout
 ls -l /dev/ttyAMA0
@@ -21,6 +21,7 @@ sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 
 touch /var/www/html/UNCONFIGURED
+rm -f /opt/easyBM/public_html/config.php
 
 cat /dev/null > /var/log/auth.log
 cat /dev/null > /var/log/syslog
@@ -28,10 +29,12 @@ cat /dev/null > /root/.ssh/known_hosts
 cat /dev/null > /home/pi/.ssh/known_hosts
 cat /dev/null > /home/pi/.bash_history
 cat /dev/null > /root/.bash_history
+rm -f /var/log/*.gz
 
-rm /opt/MMDVMHost/MMDVM-*.log
+rm -f /opt/MMDVMHost/MMDVM-*.log
 rm -rf /opt/backup
 
 #order important, first autoclean, then clean
 apt-get autoclean
 apt-get clean
+
