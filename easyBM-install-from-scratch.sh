@@ -62,7 +62,7 @@ echo
 echo
 pause
 
-echo "  +++ Some first checks ...."
+echo "  +++ We do some first checks ...."
 sleep 1
 echo "  ."
 sleep 1
@@ -115,21 +115,16 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Raspbian)   ostype="raspbian" ;;
     *)          ostype="rhel" ;;
 esac
-echo "  ."
-sleep 1
-echo "  ."
 sleep 1
 echo "  +++ Great, we can continue...."
 pause
 
-echo -e "\n\n +++ Update and Upgrade debian jessie light\n"
+echo -e "\n\n +++ Update and Upgrade the OS with apt....\n"
 sudo apt update && sudo apt upgrade 
 check_result $? ' Sorry,..... apt upgrade failed'
 pause
 
 echo -e "\n\n +++ installing some Tools, like git gcc make vim wget and more...\n"
-sudo apt install build-essential git screen vim  rrdtool curl whiptail g++ gcc make nano net-tools rsync build-essential nodejs wget ntpdate ntp usbutils dnsutils screenfetch
-
 # Check wget
 if [ ! -e '/usr/bin/wget' ]; then
     apt-get -y install wget
@@ -141,7 +136,7 @@ if [ ! -e '/usr/bin/make' ]; then
     check_result $? "  Sorry, can't install make. Please install it."
 fi
 # Check screen
-if [ ! -e '/usr/bin/make' ]; then
+if [ ! -e '/usr/bin/screen' ]; then
     apt-get -y install screen
     check_result $? "  Sorry, can't install screen. Please install it."
 fi
@@ -154,11 +149,6 @@ fi
 if [ ! -e '/usr/bin/whiptail' ]; then
     apt-get -y install whiptail
     check_result $? "  Sorry, can't install whiptail. Please install it."
-fi
-# Check nano
-if [ ! -e '/usr/bin/nano' ]; then
-    apt-get -y install nano
-    check_result $? "  Sorry, can't install nano. Please install it."
 fi
 # Check gcc
 if [ ! -e '/usr/bin/gcc' ]; then
@@ -175,11 +165,48 @@ if [ ! -e '/usr/sbin/ntpdate' ]; then
     apt-get -y install ntpdate
     check_result $? "  Sorry, can't install ntpdate. Please install it."
 fi
+# Check git
+if [ ! -e '/usr/bin/git' ]; then
+    apt-get -y install git
+    check_result $? "  Sorry, can't install git. Please install it."
+fi
+# Check vim
+if [ ! -e '/usr/bin/vim' ]; then
+    apt-get -y install vim
+    check_result $? "  Sorry, can't install vim. Please install it."
+fi
+# Check nano
+if [ ! -e '/usr/bin/nano' ]; then
+    apt-get -y install nano
+    check_result $? "  Sorry, can't install nano. Please install it."
+fi
+# Check rrdtool
+if [ ! -e '/usr/bin/rrdtool' ]; then
+    apt-get -y install rrdtool
+    check_result $? "  Sorry, can't install rrdtool. Please install it."
+fi
+# Check  rsync
+if [ ! -e '/usr/bin/rsync' ]; then
+    apt-get -y install rsync
+    check_result $? "  Sorry, can't install rsync. Please install it."
+fi
+# Check screenfetch
+if [ ! -e '/usr/bin/screenfetch' ]; then
+    apt-get -y install screenfetch
+    check_result $? "  Sorry, can't install screenfetch Please install it."
+fi
+# Check nodejs
+if [ ! -e '/usr/bin/nodejs' ]; then
+    apt-get -y install nodejs
+    check_result $? "  Sorry, can't install nodejs. Please install it."
+fi
+# and some more....
+sudo apt install build-essential net-tools ntp usbutils dnsutils
 
 pause
 
 echo -e "\n\n +++ disabling  bluetooth\n"
-grep -i 'dtoverlay=pi3-disable-bt' /boot/config.txt
+/bin/grep -q -i 'dtoverlay=pi3-disable-bt' /boot/config.txt
 if [ $? -gt 0 ]; then 
   sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
 fi
@@ -194,13 +221,13 @@ else
   sudo systemctl stop serial-getty@ttyAMA0.service
   sudo systemctl disable serial-getty@ttyAMA0.service
   echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
+  echo " it looks like:"
+  echo "                crw-rw---T 1 root dialout 204, 64 Mar 10 13:47 /dev/ttyAMA0"
+  echo " otherwise do the following command: sudo usermod –a –G dialout <username>"
+  echo " Now, please Check:"
   ls -ls /dev/ttyAMA0
-  echo " looks like:"
-  echo "crw-rw---T 1 root dialout 204, 64 Mar 10 13:47 /dev/ttyAMA0"
-  echo "sudo usermod –a –G dialout <username>"
 fi
 #
-
 pause
 
 echo -e "\n\n +++ installing NTP\n"
@@ -209,13 +236,13 @@ sudo apt install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl star
 echo '#!/bin/sh' > /etc/cron.daily/ntpdate
 echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
 chmod 775 /etc/cron.daily/ntpdate
-ntpdate -s pool.ntp.org
+sudo ntpdate -s pool.ntp.org
 
 pause
 
 echo -e "\n\n +++ installing ramdisk\n" 
 sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
-grep ramdisk /etc/fstab
+/bin/grep -q ramdisk /etc/fstab
 if [ $? -gt 0 ]; then
   echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=64M 0 0" >> /etc/fstab
   mount -a
@@ -234,15 +261,24 @@ sudo apt install lighttpd php5-common php5-cgi php5
 sudo lighty-enable-mod fastcgi
 sudo lighty-enable-mod fastcgi-php
 sudo service lighttpd restart
-sudo rm /var/www/html/index.html
-sudo rm /var/www/html/index.lighttpd.html
+if [ -f /var/www/html/index.html ]; then 
+ sudo rm -f /var/www/html/index.html
+fi
+if [ -f /var/www/html/index.lighttpd.html ]; then 
+ sudo rm -f /var/www/html/index.lighttpd.html
+fi
 sudo usermod -a -G www-data pi
 ## FIXME gpio gibts noch garnicht
 sudo usermod -a -G gpio www-data
 ## FIXME, checken ob es schon drin steht##
 ## evtl mit sed
-echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
 
+/bin/grep -q "^www-data" /etc/sudoers
+if [ $? -gt 0 ]; then
+ echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
+else
+ echo "UPS, www-data found in /etc/sudoers, so whats next? FIXME"
+fi
 pause 
 
 echo -e "\n\n +++ installing and updating wiringPi\n"
@@ -489,33 +525,30 @@ pause
 echo -e "\n\n +++ copying files\n"
 sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
-sudo cp -b -f /opt/easyBM/files/.bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
+sudo cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
 sudo cp -b -f /opt/easyBM/files/ircddbgateway.default /etc/default/ircddbgateway
 
 echo -e "\n\n +++ editing some files\n"
 #sed -i -e '$i \nohup sh /opt/easyBM/easyBM-send-startup-info.sh\n' rc.local
 
-
-
-echo -e "\n\n + restarting services\n"
+echo -e "\n\n +++ restarting services, lighttpd, cron \n"
 sudo systemctl restart lighttpd
-sudo /etc/init.d/cron restart
 sudo systemctl restart cron
 
 pause 
 
-echo -e "\n\n + Setup for first use\n"
+echo -e "\n\n +++ Setup for first use\n"
 sudo touch /var/www/html/UNCONFIGURED
 echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php'); } else { header('Location:/MMDVMHost-Dashboard/index.php'); } ?>" > /var/www/html/index.php
 
-echo -e "\n\n + clean up...\n"
+echo -e "\n\n +++ doing a clean up...\n"
 sudo apt-get autoclean
 sudo apt-get autoremove
 
 pause
 
 
-echo -e "\n\n + creating login message\n"
+echo -e "\n\n +++ creating your login message\n"
 echo "
 __________________________________________________________________________
 
@@ -554,3 +587,10 @@ Thank you.
 Sincerely yours
 bm262.de team
 "
+echo
+echo
+echo -e "\n\n Please do no a reboot, so all changes can take effect...\n"
+echo -e "\n And after the Reboot, please visit the Website http://ip/admin/\n"
+echo -e " OR login as user pi again and use the console menu....\n"
+echo 
+
