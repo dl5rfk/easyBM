@@ -116,7 +116,10 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     *)          ostype="rhel" ;;
 esac
 sleep 1
+echo 
+echo
 echo "  +++ Great, we can continue...."
+echo
 pause
 
 echo -e "\n\n +++ Update and Upgrade the OS with apt....\n"
@@ -200,8 +203,13 @@ if [ ! -e '/usr/bin/nodejs' ]; then
     apt-get -y install nodejs
     check_result $? "  Sorry, can't install nodejs. Please install it."
 fi
+# Check wicd-curses
+if [ ! -e '/usr/bin/wicd-curses' ]; then
+    apt-get -y install wicd-curses
+    check_result $? "  Sorry, can't install wicd-curses. Please install it."
+fi
 # and some more....
-sudo apt install build-essential net-tools ntp usbutils dnsutils
+sudo apt-get -y install build-essential net-tools ntp usbutils dnsutils 
 
 pause
 
@@ -406,9 +414,6 @@ sudo mv /var/www/opendvconfig.php /var/www/html/ircddbgateway/
 sudo echo "<?php header('Location: ircddbgateway.php'); ?>" > /var/www/html/ircddbgateway/index.php
 sudo chown -R www-data:www-data /var/www/html/ircddbgateway/
 ln -s var/www/html/ircddbgateway/ircddblocal.php /var/www/html/ircddblocal.php
-
-ls -lsa /etc/ircddbgateway
-ls -lsa /home/opendv/ircddbgateway/ircddbgateway
 sudo chmod 666 /home/opendv/ircddbgateway/ircddbgateway
 
 pause 
@@ -418,7 +423,7 @@ cd /opt
 sudo git clone https://github.com/g4klx/YSFClients.git
 cd /opt/YSFClients/YSFGateway
 make clean all
-sudo cp /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
+sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
 sudo mkdir /etc/YSFGateway 
 sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway.ini /etc/YSFGateway/
 sudo cp -f /opt/YSFClients/YSFGateway/YSFHosts.txt /etc/YSFGateway/
@@ -435,116 +440,32 @@ sudo mkdir -p /mnt/ramdisk/YSFGateway
 sudo chgrp mmdvm /mnt/ramdisk/YSFGateway
 sudo chmod g+w /mnt/ramdisk/YSFGateway
 #
-echo "
-#!/bin/bash
-### BEGIN INIT INFO
-#
-# Provides:             YSFGateway
-# Required-Start:       $all
-# Required-Stop:        
-# Default-Start:        2 3 4 5
-# Default-Stop:         0 1 6
-# Short-Description:    Example startscript YSFGateway
-
-#
-### END INIT INFO
-## Fill in name of program here.
-PROG="YSFGateway"
-PROG_PATH="/usr/local/bin/"
-PROG_ARGS="/etc/YSFGateway/YSFGateway.ini"
-PIDFILE="/var/run/YSFGateway.pid"
-USER="root"
-
-start() {
-      if [ -e $PIDFILE ]; then
-          ## Program is running, exit with error.
-          echo "Error! $PROG is currently running!" 1>&2
-          exit 1
-      else
-          ## Change from /dev/null to something like /var/log/$PROG if you want to save output.
-      sleep 20
-          cd $PROG_PATH
-          ./$PROG $PROG_ARGS
-          echo "$PROG started"
-          touch $PIDFILE
-      fi
-}
-
-stop() {
-      if [ -e $PIDFILE ]; then
-          ## Program is running, so stop it
-         echo "$PROG is running"
-         rm -f $PIDFILE
-         killall $PROG
-         echo "$PROG stopped"
-      else
-          ## Program is not running, exit with error.
-          echo "Error! $PROG not started!" 1>&2
-          exit 1
-      fi
-}
-
-## Check to see if we are running as root first.
-## Found at http://www.cyberciti.biz/tips/shell-root-user-check-script.html
-if [ "$(id -u)" != "0" ]; then
-      echo "This script must be run as root" 1>&2
-      exit 1
-fi
-
-case "$1" in
-      start)
-          start
-          exit 0
-      ;;
-      stop)
-          stop
-          exit 0
-      ;;
-      reload|restart|force-reload)
-          stop
-          sleep 5
-          start
-          exit 0
-      ;;
-      **)
-          echo "Usage: $0 {start|stop|reload}" 1>&2
-          exit 1
-      ;;
-esac
-exit 0
-### END
-
-" > /etc/init.d/YSFGateway
-#
+sudo cp -f /opt/easyBM/files/YSFGateway.init /etc/init.d/YSFGateway
 sudo chmod 755 /etc/init.d/YSFGateway
 sudo update-rc.d YSFGateway defaults
 sudo update-rc.d YSFGateway enable
 
 pause
 
-echo -e "\n\n +++ copying files\n"
+echo -e "\n\n +++ setting up the os system\n"
 sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
 sudo cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && sudo chown pi:pi /home/pi/.bash_login
 sudo cp -b -f /opt/easyBM/files/ircddbgateway.default /etc/default/ircddbgateway
-
-echo -e "\n\n +++ editing some files\n"
+sudo cp -b -f /opt/easyBM/files/easyBM.profile /etc/profile.d/easyBM.sh
 #sed -i -e '$i \nohup sh /opt/easyBM/easyBM-send-startup-info.sh\n' rc.local
-
-echo -e "\n\n +++ restarting services, lighttpd, cron \n"
-sudo systemctl restart lighttpd
-sudo systemctl restart cron
-
+sudo echo "easybm" > /etc/hostname
+sudo systemctl enable ssh.service
+sudo systemctl start ssh.service
 pause 
 
-echo -e "\n\n +++ Setup for first use\n"
+echo -e "\n\n +++ prepare for the first use\n"
 sudo touch /var/www/html/UNCONFIGURED
 echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php'); } else { header('Location:/MMDVMHost-Dashboard/index.php'); } ?>" > /var/www/html/index.php
-
-echo -e "\n\n +++ doing a clean up...\n"
 sudo apt-get autoclean
 sudo apt-get autoremove
-
+sudo systemctl restart lighttpd
+sudo systemctl restart cron
 pause
 
 
@@ -554,38 +475,27 @@ __________________________________________________________________________
 
   Thank you for using easyBM, a Linux Image made by the German BM Group
 
-  Start the Service-Menu by running  /opt/easyBM/easyBM-Menu.sh
-
   Please do not hesitate to contact us http://easybm.bm262.de 
 
-	Notice:	
-		 Check Service Status with
-		 # sudo systemctl status mmdvmhost.service
-
-		 Restart Service with
-		 # sudo systemctl restart mmdvmhost.service
+	Notice: Use the command 'ebm' to start the our service-menu !
+	
 __________________________________________________________________________
 
 Version `date -I` is ready to start......
 
 " > /etc/motd
-
-
-echo -e "\n\n + ALL DONE ......\n" 
 echo 
 screenfetch
 echo 
 echo
-echo -e "Congratulations, you have just successfully installed \
-
- easyBM
-
-We hope that you enjoy your installation of easyBM. Please \
-feel free to contact us anytime if you have any questions.
-Thank you.
-
-Sincerely yours
-bm262.de team
+echo -e "\nCongratulations, you have just successfully installed -easyBM- \n
+\n
+  We hope that you enjoy your installation of easyBM.\n
+  Please feel free to contact us anytime, if you have any questions.\n
+\n
+  Sincerely yours\n
+  bm262.de team\n
+\n
 "
 echo
 echo
