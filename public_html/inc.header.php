@@ -115,7 +115,17 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
                	   <li class="divider"></li>
            	  </ul>
          	</li>
-
+                <li class="dropdown">
+                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+		   <li><a target="_blank" href="https://register.ysfreflector.de/register">Register a YSF Reflector</a></li>
+	           <li><a target="_blank" href="https://register.ham-digital.org/">CCS7 Registration</a></li>
+		   <li><a target="_blank" href="https://dmr-marc.net/cgi-bin/trbo-database/register.cgi">DMR-MARC Registration</a></li>
+                   <li class="divider"></li>
+                  </ul>
+                </li>
+		
+		<li><a href="/admin/log-viewer.php">Logs</a></li>
 		<li><a href="/admin/restart.php">Restart</a></li>
 		<li><a href="/admin/about.php">About</a></li>
                	<li><a href="/admin/help.php#editing">Help</a></li>

@@ -13,6 +13,7 @@ memory=$(grep 'MemTotal' /proc/meminfo |tr ' ' '\n' |grep [0-9])
 arch=$(uname -i)
 release=$(cat /etc/debian_version|grep -o [0-9]|head -n1)
 codename="$(cat /etc/os-release |grep VERSION= |cut -f 2 -d \(|cut -f 1 -d \))"
+localipaddr=`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1`
 
 # Define functions
 function pause(){
@@ -326,10 +327,8 @@ cd /opt
 sudo git clone https://github.com/g4klx/MMDVMHost.git
 cd /opt/MMDVMHost
 sudo make clean all
-echo
 sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
-echo
-sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.origin
+sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
 
 pause
 
@@ -376,7 +375,6 @@ echo -e "\n\n +++ installing MMDVMHost-Dashboard\n"
 cd /var/www/html/
 sudo git clone https://github.com/dg9vh/MMDVMHost-Dashboard.git 
 sudo chown -Rv www-data:www-data /var/www/html/MMDVMHost-Dashboard/*
-sudo mv /var/www/html/MMDVMHost-Dashboard/setup.php /var/www/html/MMDVMHost-Dashboard/dashboard.setup.php
 
 pause
 
@@ -500,7 +498,7 @@ echo -e "\nCongratulations, you have just successfully installed -easyBM- \n
 echo
 echo
 echo -e "\n\n Please do no a reboot, so all changes can take effect...\n"
-echo -e "\n And after the Reboot, please visit the Website http://ip/admin/\n"
+echo -e "\n And after the Reboot, please visit the Website http://`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1`/admin/\n"
 echo -e " OR login as user pi again and use the console menu....\n"
 echo 
 

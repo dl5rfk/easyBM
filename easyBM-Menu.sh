@@ -42,7 +42,7 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20170105 by dl5rfk]" --menu
 66 " Update YSFGateway Software " \
 71 " Turn off SWAP file " \
 72 " Turn off ttyAMA0 service " \
-81 " Backup all " \
+81 " Backup all files " \
 91 " Restart MMDVMHost " \
 92 " Restart ircddbgateway " \
 93 " Restart YFSGateway " \

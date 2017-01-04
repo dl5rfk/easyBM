@@ -83,8 +83,9 @@ if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Da
 	<tr><td>System Time</td><td><?php print(shell_exec("date")); ?></td></tr>
 	<tr><td>Free Memory</td><td><?php echo getSymbolByQuantity($hdGnu); ?></td></tr>
 	<tr><td>Ramdisk</td><td><pre><?php print(shell_exec("ls -sh /mnt/ramdisk")); ?></pre></td></tr>
-	<tr><td>MMDVM.ini File</td><td>Found at : <?php print(shell_exec("find / -name MMDVM.ini")); ?></td></tr>
-	<tr><td>DMRIds.dat</td><td>Found at : <?php print(shell_exec("find / -name DMRIds.dat")); ?></td></tr>
+	<tr><td>MMDVM.ini File</td><td>Found at : <?php print(shell_exec("find / -type f -name MMDVM.ini")); ?></td></tr>
+	<tr><td>DMRIds.dat</td><td>Found at : <?php print(shell_exec("find / -type f -name DMRIds.dat")); ?></td></tr>
+	<tr><td>YSFGateway.ini File</td><td>Found at : <?php print(shell_exec("find / -type f -name YSFGateway.ini")); ?></td></tr>
 	<tr><td>ARP</td><td><pre><?php print(shell_exec("arp -a")); ?></pre></td></tr>
 	<tr><td>IP Route</td><td><pre><?php print(shell_exec("ip route")); ?></pre></td></tr>
 	<tr><td>Public IP-Address</td><td><?php echo $publicip; ?></td></tr>
