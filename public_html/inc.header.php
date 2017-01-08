@@ -84,26 +84,26 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Infos & Tool´s<b class="caret"></b></a>
                   <ul class="dropdown-menu">
                    <li><a href="/admin/status.php">System Status</a></li>
+		   <li><a href="network_vnstat.php">Network Statistics</a></li>
         	   <li><a href="/MMDVMHost-Dashboard/">MMDVM Dashboard</a></li>
                    <li><a href="/admin/ircddbgatewaydashboard.php">ircDDB Dashboard</a></li>
                    <li><a href="/admin/bm-groups.php">BrandMeister TalkGroups</a></li>
-                   <li><a href="/admin/searchid.php">Search ID</a></li>
+                   <li class="divider"></li>
                    <li><a href="/admin/tools.php">Net Tools</a></li>
                    <li><a href="/admin/webconsole.php">SSH WebConsole</a></li>
-                   <li class="divider"></li>
                   </ul>
                 </li>		
 
 		<li class="dropdown">
 		 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Configuration<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-				   <li><a href="/admin/config_system.php">System</a></li>
-				   <li><a href="/admin/config_network.php">IP Network</a></li>
-				   <li><a href="/admin/gpio.php">GPIO-Ports</a></li>
-				   <li class="divider"></li>
-				   <li><a href="/admin/config_mmdvm.php">MMDVM (DMR)</a></li>
-				   <li><a href="/admin/config_ircddbgateway.php">ircddbgateway (D-Star)</a></li>
-				   <li><a href="/admin/config_ysfgateway.php">YSFGateway (C4FM)</a></li>						   
+			   <li><a href="/admin/config_system.php">System</a></li>
+			   <li><a href="/admin/config_network.php">IP Network</a></li>
+			   <li><a href="/admin/gpio.php">GPIO-Ports</a></li>
+			   <li class="divider"></li>
+			   <li><a href="/admin/config_mmdvm.php">MMDVM (DMR)</a></li>
+			   <li><a href="/admin/config_ircddbgateway.php">ircddbgateway (D-Star)</a></li>
+			   <li><a href="/admin/config_ysfgateway.php">YSFGateway (C4FM)</a></li>						   
                   </ul>
                 </li>
 		<li class="dropdown">
@@ -123,6 +123,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
 	           <li><a target="_blank" href="https://register.ham-digital.org/">CCS7 Registration</a></li>
 		   <li><a target="_blank" href="https://dmr-marc.net/cgi-bin/trbo-database/register.cgi">DMR-MARC Registration</a></li>
 		   <li><a target="_blank" href="http://regsrv.ircddb.net/index.htm">irdDDB Registration</a></li>
+                   <li><a target="_blank" href="http://ham-digital.org/dmr-userreg.php">DMR ID Search</a></li>
                    <li class="divider"></li>
                   </ul>
                 </li>
