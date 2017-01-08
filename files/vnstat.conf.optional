@@ -1,0 +1,20 @@
+# edit /etc/vnstat.conf and replace the
+# image colors at the end of the file
+# with the following lines
+
+
+# image colors
+CBackground     "333333"
+CEdge           "444444"
+CHeader         "444444"
+CHeaderTitle    "EDEDED"
+CHeaderDate     "EDEDED"
+CText           "EDEDED"
+CLine           "B0B0B0"
+CLineL          "-"
+CRx             "009FC5"
+CTx             "85BD00"
+CRxD            "-"
+CTxD            "-"
+
+

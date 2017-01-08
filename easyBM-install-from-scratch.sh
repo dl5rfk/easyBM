@@ -239,19 +239,28 @@ fi
 #
 pause
 
+echo -e "\n\n +++ installing rpi-clone\n"
+ cd /opt/
+ git clone https://github.com/billw2/rpi-clone.git
+ cd rpi-clone
+ sudo cp rpi-clone /usr/local/sbin/
+ sudo mkdir /mnt/clone /mnt/sda /mnt/sdb /mnt/sdc
+
+pause
+
 echo -e "\n\n +++ installing NTP\n"
-sudo apt install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl start ntp
-# NTP Synchronization
-echo '#!/bin/sh' > /etc/cron.daily/ntpdate
-echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
-chmod 775 /etc/cron.daily/ntpdate
-sudo ntpdate -s pool.ntp.org
+ sudo apt install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl start ntp
+ # NTP Synchronization
+ echo '#!/bin/sh' > /etc/cron.daily/ntpdate
+ echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
+ chmod 775 /etc/cron.daily/ntpdate
+ sudo ntpdate -s pool.ntp.org
 
 pause
 
 echo -e "\n\n +++ installing ramdisk\n" 
-sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
-/bin/grep -q ramdisk /etc/fstab
+ sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
+ /bin/grep -q ramdisk /etc/fstab
 if [ $? -gt 0 ]; then
   echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=64M 0 0" >> /etc/fstab
   mount -a
@@ -289,6 +298,13 @@ else
  echo "UPS, www-data found in /etc/sudoers, so whats next? FIXME"
 fi
 pause 
+
+echo -e "\n\n +++ installing vnstat and vnstati\n"
+echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
+ sudo apt-get install vnstat vnstati php5-gd
+ sudo mkdir /var/www/html/vnstati
+ sudo wget http://j0hn.uk/vnstati/template.html -O /var/www/html/vnstati/index.html
+pause
 
 echo -e "\n\n +++ installing and updating wiringPi\n"
 if [ ! -d "/opt/wiringPi/" ]; then

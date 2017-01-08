@@ -42,7 +42,8 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20170105 by dl5rfk]" --menu
 66 " Update YSFGateway Software " \
 71 " Turn off SWAP file " \
 72 " Turn off ttyAMA0 service " \
-81 " Backup all files " \
+81 " Backup all files into one tar-File" \
+82 " Clone SD-Card with rpi-clone" \
 91 " Restart MMDVMHost " \
 92 " Restart ircddbgateway " \
 93 " Restart YFSGateway " \
@@ -173,6 +174,7 @@ case $choice in
 	echo
 	read -p " Backup done, press [Enter] to continue..."
 ;;
+82) clear; echo; /usr/local/sbin/rpi-clone; read -p " Clone created, press [Enter] to continue...";;
 91) clear; echo; /usr/bin/sudo systemctl restart mmdvmhost.service && /usr/bin/sudo systemctl status mmdvmhost.service; read -p " Restart done, press [Enter] to continue...";;
 92) clear; echo; /usr/bin/sudo systemctl restart ircddbgateway.service; read -p " Restart done, press [Enter] to continue...";;
 93) clear; echo; /etc/init.de/YSFgateway stop && /etc/init.d/YSFGateway start; read -p " Restart done, press [Enter] to continue...";;
