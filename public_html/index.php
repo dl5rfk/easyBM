@@ -4,7 +4,7 @@
  *
  * Use this code for a easyBM Setup
  *
- * @file       /var/www/html/admin/index.php
+ * @file       /opt/easyBM/public_html/index.php
  * @author     DL5RFK <easybm@dl5rfk.org>
  * @copyright  2016 The German BrandMeister Team
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3

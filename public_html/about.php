@@ -29,6 +29,7 @@ include_once("inc.header.php");
 	 <dt>Idear by:</dt><dd>DH6MBT, DL5RFK</dd>
 	 <dt>License:</dt><dd>GNU GPL v3</dd>
 	 <dt>Contact:</dt><dd>Visit http://www.bm262.de for more details.</dd>
+	 <dt>Remarks:</dt><dd>You can login into the system with username pi and default password. Then you see the easyBM console menu.</dd>
 	</dl>
      
      <center>

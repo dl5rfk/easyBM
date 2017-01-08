@@ -93,10 +93,12 @@ case $choice in
 	fi
 	 cd /opt/MMDVMHost/ && /usr/bin/sudo /bin/cp /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
 	/usr/bin/sudo /usr/bin/git pull
+	# mit SED version ergaenzen um -ebm
 	if [ $? -eq 0 ]; then
-	 /usr/bin/sudo /usr/bin/make && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
+	 /usr/bin/sudo /usr/bin/make clean all && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
 	else 
-	  /usr/bin/sudo whiptail --title "ERROR" --msgbox "Update failed, sorry !\n\n Please try to update manualy " 25 70
+	 rm /opt/MMDVMHost/MMDVM.ini && /usr/bin/sudo /usr/bin/git pull 
+	 /usr/bin/sudo /usr/bin/make clean all && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
 	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;
@@ -116,7 +118,7 @@ case $choice in
           echo "Sorry, YSFGateway directory does not exists in /opt/YSFClients !"
           exit 1;
         fi
-	 cd /opt/YSFClients/YSFGateway/
+	cd /opt/YSFClients/YSFGateway/
 	/usr/bin/sudo /usr/bin/git pull
 	/usr/bin/sudo /usr/bin/make clean all
 	echo
