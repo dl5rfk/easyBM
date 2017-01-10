@@ -42,6 +42,7 @@ choice=$(whiptail --title "easyBM Service Menu [Ver. 20170105 by dl5rfk]" --menu
 66 " Update YSFGateway Software " \
 71 " Turn off SWAP file " \
 72 " Turn off ttyAMA0 service " \
+73 " Cleanup .ini Files " \
 81 " Backup all files into one tar-File" \
 82 " Clone SD-Card with rpi-clone" \
 91 " Restart MMDVMHost " \
@@ -137,6 +138,10 @@ case $choice in
 ;;
 71) /usr/bin/sudo dphys-swapfile swapoff; if [ $?=0 ]; then /usr/bin/sudo whiptail --title "SWAP File" --msgbox "\n\nNow swapping is off !\n\n" 30 70; fi;;
 72) /usr/bin/sudo systemctl stop serial-getty@ttyAMA0.service && /usr/bin/sudo systemctl disable serial-getty@ttyAMA0.service && /usr/bin/sudo whiptail --title "ttyAMA0 Status" --msgbox "Please check the file permissions, owner has to be root and the group has to be dailout.\n\n\ `ls -ls /dev/ttyAMA0`" 30 70;;
+73) 
+	/usr/bin/find /opt/MMDVM/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \; 
+	/usr/bin/find /etc/YSFGateway/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \;
+	;;
 81)
 	clear
 	if [ ! -d "/opt/backup" ]; then

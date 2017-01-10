@@ -56,7 +56,8 @@ function is_loggedin(){
 
 //load ini file into an array
 function getMMDVMConfig() {
-        // loads into array for further use
+        exec("/usr/bin/find /opt/MMDVM/ -name \"*.ini\" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {}\;"); 
+	// loads into array for further use
         $conf = array();
         $conf = parse_ini_file(MMDVMINIPATH."/".MMDVMINIFILENAME,TRUE);
         return $conf;
