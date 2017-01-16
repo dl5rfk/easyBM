@@ -62,32 +62,35 @@ fi
 
 case $choice in
 11) /usr/bin/sudo whiptail --title "IP Address" --msgbox "A list of all interfaces: \n\n `ip addr show`" 25 70;;
-12) [ -w "/mnt/ramdisk/MMDVM-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/MMDVM-`date -I`.log || (echo "  Sorry, file not found! Please wait 5 seconds..."; sleep 5);;
-13) [ -w "/mnt/ramdisk/YFSGateway-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/YFSGateway-`date -I`.log || (echo "  Sorry, file not found! Please wait 5 seconds..."; sleep 5);;
-21) [ -w "/etc/network/interfaces" ] && /usr/bin/sudo /usr/bin/nano /etc/network/interfaces || (echo "   Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
-22) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && /usr/bin/sudo /usr/bin/nano /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
-23) [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
-24) [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
-25) [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
+12) [ -r "/mnt/ramdisk/MMDVM-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/MMDVM-`date -I`.log || (echo "  Sorry, file not found! Please wait 5 seconds..."; sleep 5);;
+13) [ -r "/mnt/ramdisk/YFSGateway-`date -I`.log" ] && /usr/bin/sudo /usr/bin/less /mnt/ramdisk/YFSGateway-`date -I`.log || (echo "  Sorry, file not found! Please wait 5 seconds..."; sleep 5);;
+21) /usr/bin/sudo [ -w "/etc/network/interfaces" ] && /usr/bin/sudo /usr/bin/nano /etc/network/interfaces || (echo "   Sorry, file not found or writeable ! Please wait 5 seconds..."; sleep 5) ;;
+22) /usr/bin/sudo [ -w "/opt/MMDVMHost/MMDVM.ini" ] && /usr/bin/sudo /usr/bin/nano /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found or writeable! Please wait 5 seconds..."; sleep 5) ;;
+23) /usr/bin/sudo [ -w "/etc/ircddbgateway" ] && /usr/bin/sudo /usr/bin/nano /etc/ircddbgateway || (echo "   Sorry, file not found or writeable! Please wait 5 seconds..."; sleep 5) ;;
+24) /usr/bin/sudo [ -w "/etc/cron.d/easyBM" ] && /usr/bin/sudo /usr/bin/nano /etc/cron.d/easyBM || (echo "   Sorry, file not found or writeable! Please wait 5 seconds..."; sleep 5) ;;
+25) /usr/bin/sudo [ -w "/etc/YSFGateway/YSFGateway.ini" ] && /usr/bin/sudo /usr/bin/nano /etc/YSFGateway/YSFGateway.ini || (echo "Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
 26) /usr/bin/sudo iwlist wlan0 scan|/bin/egrep "(ESSID|IEEE)" ; echo "Search for your WIFI SSID, remeber it !"; sleep 10 && /usr/bin/sudo nano /etc/wpa_supplicant/wpa_supplicant.conf ;; 
-27) [ -x "/usr/bin/wicd-curses" ] && /usr/bin/sudo wicd-curses || (echo "Sorry, Programm not found! Please wait 5 seconds..."; sleep 5);;
-31) [ -x "/usr/bin/ircddbgw_conf" ] && /usr/bin/sudo /usr/bin/ircddbgw_conf || (echo "Sorry, Programm not found! Please wait 5 seconds..."; sleep 5) ;;
-41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found! Please wait 5 seconds..."; sleep 5) ;;
+27) [ -x "/usr/bin/wicd-curses" ] && /usr/bin/sudo wicd-curses || (echo "Sorry, Programm not found or executeable! Please wait 5 seconds..."; sleep 5);;
+31) [ -x "/usr/bin/ircddbgw_conf" ] && /usr/bin/sudo /usr/bin/ircddbgw_conf || (echo "Sorry, Programm not found or executeable! Please wait 5 seconds..."; sleep 5) ;;
+41) [ -w "/opt/MMDVMHost/MMDVM.ini" ] && chmod 666 /opt/MMDVMHost/MMDVM.ini || (echo "   Sorry, file not found or wirteable! Please wait 5 seconds..."; sleep 5) ;;
 61) /opt/easyBM/easyBM-Update-DStar-Hostfiles.sh ;;
 62) 
 	clear
+	echo "Updating OS......."
 	sudo apt update && sudo apt upgrade && sudo apt-get autoremove && sudo apt-get autoclean
 	echo
 	read -p " Update done, press [Enter] to continue..."
  	;;
 63) 
 	clear
+	echo "Updateing easyBM....."
 	cd /opt/easyBM
 	/usr/bin/sudo /usr/bin/git pull
 	read -p " Update done, press [Enter] to continue..."
 	;;
 64) 
 	clear
+	echo "Updateing MMDVMHost....."
 	if [ ! -d "/opt/MMDVMHost" ]; then 
 	  echo "Sorry, MMDVMHost directory does not exists in /opt/ !" 
 	  exit 1;
@@ -105,16 +108,19 @@ case $choice in
 	;;
 65) 
 	clear
+	echo "Updateing MMDVMHost-Dashboard....."
 	cd /var/www/html/MMDVMHost-Dashboard 
-	/bin/cp /var/www/html/MMDVMHost-Dashboard/config/config.php /var/www/html/MMDVMHost-Dashboard/config/config.php.`/bin/date -I` && /usr/bin/git pull 
-	if [ -w /var/www/html/MMDVMHost-Dashboard/setup.php ]; then
-	/bin/mv /var/www/html/MMDVMHost-Dashboard/setup.php /var/www/html/MMDVMHost-Dashboard/setup.php.offline 
+	/usr/bin/sudo /bin/cp /var/www/html/MMDVMHost-Dashboard/config/config.php /var/www/html/MMDVMHost-Dashboard/config/config.php.`/bin/date -I` 
+	/usr/bin/sudo /usr/bin/git pull 
+	if [ -r /var/www/html/MMDVMHost-Dashboard/setup.php ]; then
+	 /usr/bin/sudo /bin/mv /var/www/html/MMDVMHost-Dashboard/setup.php /var/www/html/MMDVMHost-Dashboard/notused.setup.php
 	fi
 	read -p " Update done, press [Enter] to continue..."
 	;;
 
 66)
 	clear
+	echo "Updateing YSFGateway....."
 	if [ ! -d "/opt/YSFClients/YSFGateway" ]; then
           echo "Sorry, YSFGateway directory does not exists in /opt/YSFClients !"
           exit 1;
