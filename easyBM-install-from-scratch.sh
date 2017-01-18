@@ -477,6 +477,7 @@ sudo /bin/sed -i '/mail/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/kern/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/user/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/deamon/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/rotate/s/[0-9]/2/' /etc/logrotate.conf
 pause 
 
 echo -e "\n\n +++ prepare for the first use\n"

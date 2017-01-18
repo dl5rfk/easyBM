@@ -25,3 +25,9 @@
 0/10 * * * * root /usr/bin/pgrep YSFGateway || /etc/init.d/ysfgateway start >/dev/null 2>&1
 #create PNG for vnstati
 */15 * * * * root /usr/bin/nice /opt/easyBM/vnstati.sh >/dev/null 2>&1
+
+#
+#Delete Logfiles after 7 days in /mnt/ramdisk, for 24x7 operation like a repeater
+0 0 * * * root /usr/bin/find /mnt/ramdisk/ -xdev -type f -mtime +7 -exec rm -f {} \;
+
+
