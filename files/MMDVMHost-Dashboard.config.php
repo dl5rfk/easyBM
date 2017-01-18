@@ -3,18 +3,18 @@
 # Be careful, when manual editing this!
 
 date_default_timezone_set('UTC');
-define("MMDVMLOGPATH", "/mnt/ramdisk/");
-define("MMDVMINIPATH", "/opt/MMDVMHost/");
+define("MMDVMLOGPATH", "/mnt/ramdisk");
+define("MMDVMINIPATH", "/opt/MMDVMHost");
 define("MMDVMINIFILENAME", "MMDVM.ini");
-define("MMDVMHOSTPATH", "/opt/MMDVMHost/");
+define("MMDVMHOSTPATH", "/opt/MMDVMHost");
 define("ENABLEXTDLOOKUP", "on");
 define("DMRIDDATPATH", "/opt/MMDVMHost/DMRIds.dat");
 define("ENABLEYSFGATEWAY", "on");
-define("YSFGATEWAYLOGPATH", "/var/log/YSFGateway/");
+define("YSFGATEWAYLOGPATH", "/var/log/YSFGateway");
 define("YSFGATEWAYLOGPREFIX", "YFSGateway");
-define("YSFGATEWAYINIPATH", "/etc/YFSGateway/");
+define("YSFGATEWAYINIPATH", "/etc/YFSGateway");
 define("YSFGATEWAYINIFILENAME", "YFSGateway.ini");
-define("YSFHOSTSPATH", "/etc/YFSGateway/");
+define("YSFHOSTSPATH", "/etc/YFSGateway");
 define("YSFHOSTSFILENAME", "YSFHosts.txt");
 define("LINKLOGPATH", "/var/log");
 define("IRCDDBGATEWAY", "ircddbgatewayd");

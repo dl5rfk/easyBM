@@ -104,6 +104,7 @@ case $choice in
 	 rm /opt/MMDVMHost/MMDVM.ini && /usr/bin/sudo /usr/bin/git pull 
 	 /usr/bin/sudo /usr/bin/make clean all && sudo /bin/systemctl stop mmdvmhost.service && sudo /bin/systemctl start mmdvmhost.service
 	fi
+	echo -e "\n\n ** And do not forget to check you local MMDVM.ini ** \n"
 	read -p " Update done, press [Enter] to continue..."
 	;;
 65) 
