@@ -471,6 +471,12 @@ sudo cp -b -f /opt/easyBM/files/easyBM.profile /etc/profile.d/easyBM.sh
 sudo echo "easybm" > /etc/hostname
 sudo systemctl enable ssh.service
 sudo systemctl start ssh.service
+#edit rsyslog.conf
+sudo /bin/sed -i '/news/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/mail/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/kern/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/user/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/deamon/s/^/#/' /etc/rsyslog.conf
 pause 
 
 echo -e "\n\n +++ prepare for the first use\n"
