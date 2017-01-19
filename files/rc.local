@@ -17,7 +17,17 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-/usr/bin/sudo systemctl restart ircddbgateway.service
-/usr/bin/sudo systemctl restart mmdvmhost.service
+/bin/systemctl restart ircddbgateway.service
+/bin/systemctl restart mmdvmhost.service
+
+if [ -e /etc/SSHFLAG ]; then
+  /bin/systemctl enable sshd
+  /bin/rm /etc/SSHFLAG
+  /sbin/shutdown -r now
+fi
+
+if [ -x /opt/easyBM/easyBM-send-startup-info.sh ]; then 
+   /opt/easyBM/easyBM-send-startup-info.sh
+fi 
 
 exit 0

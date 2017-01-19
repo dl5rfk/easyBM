@@ -476,7 +476,9 @@ sudo /bin/sed -i '/news/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/mail/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/kern/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/user/s/^/#/' /etc/rsyslog.conf
-sudo /bin/sed -i '/deamon/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/daemon/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/lpr/s/^/#/' /etc/rsyslog.conf
+sudo /bin/sed -i '/cron/s/^/#/' /etc/rsyslog.conf
 sudo /bin/sed -i '/rotate/s/[0-9]/2/' /etc/logrotate.conf
 pause 
 
@@ -487,6 +489,8 @@ sudo apt-get autoclean
 sudo apt-get autoremove
 sudo systemctl restart lighttpd
 sudo systemctl restart cron
+sudo systemctl restart rsyslog.service
+
 pause
 
 
