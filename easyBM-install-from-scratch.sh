@@ -124,7 +124,7 @@ echo
 pause
 
 echo -e "\n\n +++ Update and Upgrade the OS with apt....\n"
-sudo apt update && sudo apt upgrade 
+sudo apt update && sudo apt-get -y upgrade 
 check_result $? ' Sorry,..... apt upgrade failed'
 pause
 
@@ -210,7 +210,7 @@ if [ ! -e '/usr/bin/wicd-curses' ]; then
     check_result $? "  Sorry, can't install wicd-curses. Please install it."
 fi
 # and some more....
-sudo apt-get -y install build-essential net-tools ntp usbutils dnsutils 
+sudo apt-get -y install build-essential net-tools ntp usbutils dnsutils iptraf
 
 pause
 
@@ -230,10 +230,11 @@ else
   sudo systemctl stop serial-getty@ttyAMA0.service
   sudo systemctl disable serial-getty@ttyAMA0.service
   echo -e "\n\n Please check the file permissions, owner has to be root and the group has to be dailout."
-  echo " it looks like:"
-  echo "                crw-rw---T 1 root dialout 204, 64 Mar 10 13:47 /dev/ttyAMA0"
+  echo " it looks like:    crw-rw---T 1 root dialout 204, 64 Mar 10 13:47 /dev/ttyAMA0"
   echo " otherwise do the following command: sudo usermod –a –G dialout <username>"
+  echo 
   echo " Now, please Check:"
+  chmod 1660  /dev/ttyAMA0
   ls -ls /dev/ttyAMA0
 fi
 #
@@ -249,7 +250,7 @@ echo -e "\n\n +++ installing rpi-clone\n"
 pause
 
 echo -e "\n\n +++ installing NTP\n"
- sudo apt install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl start ntp
+ sudo apt-get -y install ntp ntpdate && sudo systemctl enable ntp && sudo systemctl start ntp
  # NTP Synchronization
  echo '#!/bin/sh' > /etc/cron.daily/ntpdate
  echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
@@ -262,7 +263,7 @@ echo -e "\n\n +++ installing ramdisk\n"
  sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
  /bin/grep -q ramdisk /etc/fstab
 if [ $? -gt 0 ]; then
-  echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=64M 0 0" >> /etc/fstab
+  echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=128M 0 0" >> /etc/fstab
   mount -a
   echo -e "\n\n +++ now, check if ramdrive has 64MB\n\n"
   df -h /mnt/ramdisk
@@ -275,7 +276,7 @@ fi
 pause
 
 echo -e "\n\n +++ installing Webserver lighttpd\n"
-sudo apt install lighttpd php5-common php5-cgi php5
+sudo apt-get -y install lighttpd php5-common php5-cgi php5
 sudo lighty-enable-mod fastcgi
 sudo lighty-enable-mod fastcgi-php
 sudo service lighttpd restart
@@ -301,7 +302,7 @@ pause
 
 echo -e "\n\n +++ installing vnstat and vnstati\n"
 echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
- sudo apt-get install vnstat vnstati php5-gd
+ sudo apt-get -y install vnstat vnstati php5-gd
  sudo mkdir /var/www/html/vnstati
  sudo wget http://j0hn.uk/vnstati/template.html -O /var/www/html/vnstati/index.html
 pause
@@ -309,7 +310,7 @@ pause
 echo -e "\n\n +++ installing and updating wiringPi\n"
 if [ ! -d "/opt/wiringPi/" ]; then
  cd /opt/
- git clone git://git.drogon.net/wiringPi
+ sudo git clone git://git.drogon.net/wiringPi
  cd /opt/wiringPi
  sudo git pull origin
  /opt/wiringPi/build
@@ -336,8 +337,6 @@ sudo git clone https://github.com/g4klx/MMDVMCal.git
 cd /opt/MMDVMCal
 sudo make all
 
-pause
-
 echo -e "\n\n +++ installing MMDVMHost\n"
 cd /opt
 sudo git clone https://github.com/g4klx/MMDVMHost.git
@@ -345,9 +344,7 @@ cd /opt/MMDVMHost
 sudo make clean all
 sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
 sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
-
-pause
-
+sudo ln -s /opt/MMDVMHost/MMDVM.ini /etc/MMDVM.ini
 echo -e "\n\n +++ installing systemd Service MMDVM Host Service\n"
 echo " 
 [Unit]
@@ -404,7 +401,7 @@ check_result $? '  ERROR, can not add dl5di apt-key !!!'
 
 ##FIXME, das repo ist veraltet, ein neues liegt in files##
 sudo curl http://repo1.ham-digital.net/raspbian/opendv.list -o /etc/apt/sources.list.d/opendv.list
-sudo apt update && sudo apt upgrade && sudo apt install ircddbgateway
+sudo apt-get -y update && sudo apt-get -y upgrade && sudo apt-get -y -f install ircddbgateway
 
 echo -e "\n\n  +++ Please keep in mind to use the command 'sudo ircddbgw_conf' for configuration' "
 
@@ -436,7 +433,7 @@ echo -e "\n\n +++ installing C4FM YSF Software\n"
 cd /opt
 sudo git clone https://github.com/g4klx/YSFClients.git
 cd /opt/YSFClients/YSFGateway
-make clean all
+sudo make clean all
 sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
 sudo mkdir /etc/YSFGateway 
 sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway.ini /etc/YSFGateway/
@@ -485,8 +482,8 @@ pause
 echo -e "\n\n +++ prepare for the first use\n"
 sudo touch /var/www/html/UNCONFIGURED
 echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php'); } else { header('Location:/MMDVMHost-Dashboard/index.php'); } ?>" > /var/www/html/index.php
-sudo apt-get autoclean
-sudo apt-get autoremove
+sudo apt-get -y autoclean
+sudo apt-get -y autoremove
 sudo systemctl restart lighttpd
 sudo systemctl restart cron
 sudo systemctl restart rsyslog.service
@@ -504,28 +501,22 @@ __________________________________________________________________________
 
 	Notice: Use the command 'ebm' to start the our service-menu !
 	
+Installation Date: `date -I` 
 __________________________________________________________________________
-
-Version `date -I` is ready to start......
 
 " > /etc/motd
 echo 
 screenfetch
-echo 
 echo
 echo -e "\nCongratulations, you have just successfully installed -easyBM- \n
 \n
   We hope that you enjoy your installation of easyBM.\n
   Please feel free to contact us anytime, if you have any questions.\n
-\n
   Sincerely yours\n
   bm262.de team\n
 \n
 "
-echo
-echo
-echo -e "\n\n Please do no a reboot, so all changes can take effect...\n"
 echo -e "\n And after the Reboot, please visit the Website http://`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1`/admin/\n"
-echo -e " OR login as user pi again and use the console menu....\n"
+echo -e " OR login via SSH as user pi and the default password raspberry.\n"
+echo -e "\n\n Please type reboot and hit enter, now!\n"
 echo 
-
