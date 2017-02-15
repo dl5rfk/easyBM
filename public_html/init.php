@@ -11,7 +11,7 @@ session_start();
  * @review     DJ2RF <fritz@dj2rf.de>
  * @copyright  2017 The German BrandMeister Team
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
- * @version    2017-02-13
+ * @version    2017-02-14
  * @remarks    WITHOUT ANY WARRANTY OR GUARANTEE
  * @see        http://www.bm262.de
  *
@@ -59,7 +59,7 @@ function writeini($filename, $section, $var, $Wert) {
 }
 
 function stopservice()   {
-	exec('/bin/sleep 3 && sudo /sbin/systemctl stop mmdvmhost.service > /dev/null 2>&1');
+	exec('/bin/sleep 3 && sudo systemctl stop mmdvmhost.service > /dev/null 2>&1');
 }
 
 #===================================================================================================
@@ -143,10 +143,19 @@ function ini_write($_data, $filename, $maxdepth=3)
 
 //THE RESTART THING
 if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="nofunction"; }
- if ($function=='reboot'){
+ if ($function=='restart'){
 	echo '<div class="alert alert-danger">Service is restarting, now! </div>';
-	exec('/bin/sleep 3 && sudo /sbin/systemctl restart mmdvmhost.service > /dev/null 2>&1');
+	exec('/bin/sleep 3 && sudo systemctl restart mmdvmhost.service > /dev/null 2>&1');
+	echo '<div window.location.href=\'/init.php\' </div>';
  }
+ 
+
+function restart() {
+   echo '<div class="alert alert-danger">Service is restarting, now! </div>';
+	exec('/bin/sleep 3 && sudo systemctl restart mmdvmhost.service > /dev/null 2>&1');
+}
+
+
 
 ?>
 
@@ -222,6 +231,9 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	$serverpassword = ( $_POST['serverpassword'] ? $_POST['serverpassword'] : 'passw0rd');
 	$ssid = ( $_POST['ssid'] ? $_POST['ssid'] : 'Dummy');
 	$psk = ( $_POST['psk'] ? $_POST['psk'] : 'DummyKey');
+	$rxfrequency = ( $_POST['rxfrequency'] ? $_POST['rxfrequency'] : '433612500');
+	$txfrequency = ( $_POST['txfrequency'] ? $_POST['txfrequency'] : '433612500');
+	$dmrtxlevel = ( $_POST['dmrtxlevel'] ? $_POST['dmrtxlevel'] : '50');
 	
 
 	$callsign=trim($callsign);
@@ -235,35 +247,45 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	$serverpassword=trim($serverpassword);
 	$ssid=trim($ssid);
 	$psk=trim($psk);
+	$rxfrequency=trim($rxfrequency);
+	$txfrequency=trim($txfrequency); 
+	$dmrtxlevel=trim($dmrtxlevel);
 
 	//REPLACE THE CONTENT IN MMDVM.INI	
-	$RXFrequency="433612500";
-	$TXFrequency="433612500";
+	//$RXFrequency="433612500";
+	//$TXFrequency="433612500";
 	
 	
 	$Warr = writeini($MMDVMINI,"DMR","Id",strval($id));
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"Info","Location",$location);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"Info","URL",$url);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) {echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"Info","Description",$description);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"DMR Network","Address",$serveraddress);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) {echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"DMR Network","Port",$serverport);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"DMR Network","Password",$serverpassword);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }	
-	$Warr = writeini($MMDVMINI,"Info","RXFrequency",$RXFrequency);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
-	$Warr = writeini($MMDVMINI,"Info","TXFrequency",$TXFrequency);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit;}	
+	$Warr = writeini($MMDVMINI,"Info","RXFrequency",$rxfrequency);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
+	$Warr = writeini($MMDVMINI,"Info","TXFrequency",$txfrequency);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"General","Callsign",$callsign);
-	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
+	$Warr = writeini($MMDVMINI,"Modem","DMRTXLevel",$dmrtxlevel);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }	
 	
-	//ini_write($Warr, $MMDVMINI, $maxdepth=3);
-
+	// None are deleted by read the ini file. Thats a workaround
+	// to Do check why None is deleted after read 
+	$Warr = writeini($MMDVMINI,"General","Display","None");
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }	
+	//***************************************************************************************************************************
+	
+	
 	//DO THE WIFI CONFIGURATION
 	//UPS
 	//system('sudo sed -i -e \'s/psk=.*/psk="'.$psk.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
@@ -288,11 +310,13 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 	<?php  if ( $reboot== "YES") : ?>
 		<div class="alert alert-danger">
-		 <button onclick="window.location.href='/init.php?function=reboot'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately !
+		<!-- <button onclick="restart()" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately ! -->		 
+		<button onclick="window.location.href='/init.php'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately ! 
         <!-- <button onclick="window.location.href='/MMDVMHost-Dashboard/scripts/reboot.php'" type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Reboot your system, now!</button> -->
-
 		</div>
-		<?php exec('sudo rm -f /var/www/html/UNCONFIGURED'); ?>
+		<?php //echo '<div class="alert alert-danger">Service is restarting, now! </div>';
+				exec('sudo systemctl restart mmdvmhost.service > /dev/null 2>&1');
+		      exec('sudo rm -f /var/www/html/UNCONFIGURED'); ?>
 
 	<?php else: ?>
 		<center><a href="/init.php" class="btn btn-warning">Sorry, please try again !</a></center><br />
@@ -308,7 +332,9 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Description") ?>&nbsp; is your description</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Address") ?> &nbsp; is your DMR Master</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Password") ?>&nbsp; is the Password</a>
-		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","TXFrequency") ?>&nbsp; is your Hotspot frequency</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","TXFrequency") ?>&nbsp; is your Hotspot TX frequency</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","RXFrequency") ?>&nbsp; is your Hotspot RX frequency</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Modem","DMRTXLevel").'%' ?>&nbsp; is your Hotspot DMR TX Level</a>
 		</div>
 		<p>We believe it makes sense if each hotspot using the same frequency. Therefore, this was set to 433.6125MHz.</p>
 		<br />
@@ -356,15 +382,38 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="url">Your URL</label>
 		  <div class="col-md-4">
-		  <input id="url" name="url" maxlength="124" type="text" value="<?php print readini($MMDVMINI,"Info","URL") ?>" placeholder="<?php print readini($MMDVMINI,"Info","URL") ?>" class="form-control input-md" required="">
+		  <input id="url" name="url" maxlength="150" type="text" value="<?php print readini($MMDVMINI,"Info","URL") ?>" placeholder="<?php print readini($MMDVMINI,"Info","URL") ?>" class="form-control input-md" required="">
 		  <span class="help-block">For example, your QRZ.com webpage.</span>
 		  </div>
 		</div>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="description">Description</label>
 		  <div class="col-md-4">
-		  <input id="description" name="description" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","Description") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Description") ?>" class="form-control input-md" required="">
+		  <input id="description" name="description" maxlength="40" type="text" value="<?php print readini($MMDVMINI,"Info","Description") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Description") ?>" class="form-control input-md" required="">
 		  <span class="help-block">A very short description about your system.</span>
+		  </div>
+		</div>
+		
+		
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="txfrequency">Your TX QRG</label>
+		  <div class="col-md-4">
+		  <input id="txfrequency" name="txfrequency" maxlength="124" type="text" value="<?php print readini($MMDVMINI,"Info","TXFrequency") ?>" placeholder="<?php print readini($MMDVMINI,"Info","TXFrequency") ?>" class="form-control input-md" required="">
+		  <span class="help-block">For example, 433612500 <- prefered QRG.</span>
+		  </div>
+		</div>
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="rxfrequency">Your RX QRG</label>
+		  <div class="col-md-4">
+		  <input id="rxfrequency" name="rxfrequency" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","RXFrequency") ?>" placeholder="<?php print readini($MMDVMINI,"Info","RXFrequency") ?>" class="form-control input-md" required="">
+		  <span class="help-block">For example, 433612500 <- prefered QRG.</span>
+		  </div>
+		</div>
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="dmrtxlevel">Your DMR TX Level in %</label>
+		  <div class="col-md-4">
+		  <input id="dmrtxlevel" name="dmrtxlevel" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Modem","DMRTXLevel") ?>" placeholder="<?php print readini($MMDVMINI,"Modem","DMRTXLevel") ?>" class="form-control input-md" required="">
+		  <span class="help-block">TX Level from 1 to 100%.</span>
 		  </div>
 		</div>
 
@@ -436,7 +485,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 <hr>
 	<footer>
-	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2017-02-13, by BM-Team Germany)</small><br />
+	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2017-02-14, by BM-Team Germany)</small><br />
 	 <small>Uptime for this host is <?php print(shell_exec('uptime')); ?></small>
 	</footer>
 
