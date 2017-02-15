@@ -2,33 +2,32 @@
 session_start();
 
 /**
- * THE EASYMB LITE INIT WEBSITE
+ * THE EASYMB LIGHT INIT WEBSITE
  *
  * Use this code for a initial easyBM Setup 
  *
  * @file       /var/www/html/init.php
  * @author     DL5RFK <easybm@dl5rfk.org>
- * @copyright  2016 The German BrandMeister Team
+ * @review     DJ2RF <fritz@dj2rf.de>
+ * @copyright  2017 The German BrandMeister Team
  * @license    http://www.gnu.org/licenses/gpl-3.0.html GNU GPL v3
- * @version    2016-08-10
+ * @version    2017-02-13
  * @remarks    WITHOUT ANY WARRANTY OR GUARANTEE
  * @see        http://www.bm262.de
  *
  */
 
+
 //EDIT THIS PATH
 $MMDVMINI='/opt/MMDVMHost/MMDVM.ini';
 $WPACONFIG='/etc/wpa_supplicant/wpa_supplicant.conf';
-$IRCDDBCFG='/etc/ircddbgateway';
-
-$CONFIG='config.php';
-
-if (!file_exists($MMDVMINI)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> MMDVM.ini is missing. </div></p>'; }
-if (!file_exists($WPACONFIG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> WIFI wpa_supplicant.conf is missing.</div></p>'; }
-if (!file_exists($IRCDDBCFG)){ echo '<div class="alert alert-danger"> <strong>Danger!</strong> ircddbgateway config file is missing.</div></p>'; }
-if (file_exists($CONFIG)){ echo '<div class="alert alert-danger"> <h1>Danger! Web Control config file still exists. DO NOT USE THIS INIT PAGE.</h1></div></p>'; }
 
 /* ********** DO NOT CHANGE BELOW ********** */
+
+//INCLUDES DG9VH STUFF
+//include_once("MMDVMHost-Dashboard/config/config.php");
+//include_once("MMDVMHost-Dashboard/include/tools.php");
+
 
 //DEFINE SOME FUNCTIONS
 function check_callsign($callsign){
@@ -40,11 +39,113 @@ function command_exist($cmd) {
     return (empty($returnVal) ? false : true);
 }
 
-//THE REBOOT THING
+function getparams($iniF,$toSearch) {
+	$inifileparams = file_get_contents($iniF);
+	preg_match ('(^'.$toSearch.'=.*)m', $inifileparams, $SearchA);
+	$SearchA = preg_replace('(^'.$toSearch.'=)m',"", $SearchA);
+	$StrRet=$SearchA[0];
+	return($StrRet); 
+}
+
+function readini($filename, $section, $var) {
+	$array = parse_ini_file($filename, true);
+	return $array[$section][$var];
+}
+
+function writeini($filename, $section, $var, $Wert) {
+	$array = parse_ini_file($filename, true);
+	$array[$section][$var] = strval($Wert);
+	return $array;
+}
+
+function stopservice()   {
+	exec('/bin/sleep 3 && sudo /sbin/systemctl stop mmdvmhost.service > /dev/null 2>&1');
+}
+
+#===================================================================================================
+function ini_write($_data, $filename, $maxdepth=3)
+{
+	 //stopservice();
+	 	
+ 	 $fp = @fopen($filename, 'rb+');
+   ### Datei zum Lesen und Schreiben sperren ###
+    if (!flock($fp, LOCK_EX))
+    {
+        echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n";
+        exit;
+    }
+
+    #--private Funktion -------------------------------------------------------------------------
+    $writeparams = function ($_values, $arraykey, $depth) use ($fp, $maxdepth, &$writeparams)
+    {
+	foreach ($_values as $key => $param)
+	{
+            if ($depth >= 1)
+	    {
+		$arraykeytxt = $arraykey . "[$key]";
+	    }	
+	    else
+	    {   
+		$arraykeytxt = $key;
+	    }
+ 
+	    if (is_array($param))
+	    {
+		$depth++;
+		if ($depth < $maxdepth)
+		{
+	            if (false === $writeparams ($param, $arraykeytxt, $depth)) return false;
+		}	
+	    }
+	    else
+	    {
+		if (false === @fwrite ($fp, "$arraykeytxt=$param" . PHP_EOL)) return false;	
+	    }
+	}
+ 
+	return true;
+    };
+    #------------------------------------------------------------------------------------------
+
+    if ( 0 !== @fseek($fp, 0, SEEK_SET)) return false;
+    if (false === @fwrite ($fp, ';### ' . basename($filename) . ' ### ' . 
+        date('Y-m-d H:i:s') . ' ### utf-8 ### ÄÖÜäöü' . PHP_EOL . PHP_EOL)) return false;
+ 
+    $depth = 0;
+    $arraykey = '';
+ 
+    foreach ($_data as $section => $_value)
+    {
+	if (is_array($_value))
+	{
+            if (false === @fwrite ($fp, PHP_EOL . "[$section]" . PHP_EOL)) return false;
+ 
+            if ($depth < $maxdepth) 
+            {
+	    	$writeparams ($_value, $section, $depth); 
+	    }
+	}	
+	else
+        {
+            if (false === @fwrite ($fp, "$section = $_value" . PHP_EOL)) return false;	
+        }		
+    }
+ 
+    if (false === ($len = @ftell($fp))) return false;
+    if (false === @ftruncate($fp, $len)) return false;
+    
+    fclose($fp);
+ 
+    return true;
+}
+ 
+#===================================================================================================
+
+//THE RESTART THING
 if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="nofunction"; }
  if ($function=='reboot'){
-	echo '<div class="alert alert-danger">System is going down for reboot, now! </div>';
-	exec('/bin/sleep 3 && sudo /sbin/reboot > /dev/null 2>&1');
+	echo '<div class="alert alert-danger">Service is restarting, now! </div>';
+	exec('/bin/sleep 3 && sudo /sbin/systemctl restart mmdvmhost.service > /dev/null 2>&1');
  }
 
 ?>
@@ -56,9 +157,9 @@ if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
     <title>easyBM LIGHT</title>
   </head>
@@ -66,10 +167,13 @@ if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="
 <br />
 <br />
 <br />
+
 <div class="container">
     <div class="jumbotron">
-      <h1>easyBM <small>initalize your System</small></h1>
-      <p>Enter some data, and your are ready to go for the digital ham radio network <strong>BrandMeister</strong>.<a href="#" class="" data-toggle="modal" data-target="#myModal"> <small>(Show MMDVM.ini)</small> </a></p>
+    <img alt="" border="0" src="BM_Sticker.png" width="225" height="auto">
+      <h1>easyBM <small>initalize your DVMega System</small></h1>
+      <p><small>Enter some data, and your are ready to go for the digital ham radio network</small> <strong>BrandMeister</strong>.<a href="#" class="" data-toggle="modal" data-target="#myModal"> <small>(Show MMDVM.ini)</small> </a></p>
+		
 <!-- Show Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -90,10 +194,11 @@ if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="
 
 <?php
 
+
 if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	//ALLOW REBOOT	
 	$reboot="YES";
-
+   	
 	//CHECK INPUT VALUES
 	$callsign = ( $_POST['callsign'] ? $_POST['callsign'] : 'N0CALL');
 	if (!check_callsign($callsign)){ echo '<div class="alert alert-danger">You have to enter a valid Hamradio Callsign !</div>'; $reboot="NO"; }
@@ -132,52 +237,37 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	$psk=trim($psk);
 
 	//REPLACE THE CONTENT IN MMDVM.INI	
-	$inicontent = file_get_contents($MMDVMINI);
-	$inicontent = preg_replace('(^Callsign=.*)m',"Callsign=$callsign", $inicontent);
-	$inicontent = preg_replace('(^Id=.*)m',"Id=$id", $inicontent);
-	$inicontent = preg_replace('(^Location=.*)m',"Location=$location", $inicontent);
-	$inicontent = preg_replace('(^URL=.*)m',"URL=$url", $inicontent);
-	$inicontent = preg_replace('(^Description=.*)m',"Description=$description", $inicontent);
-	$inicontent = preg_replace('(^Address=.*)m',"Address=$serveraddress", $inicontent);
-	//$inicontent = preg_replace('/(^Port=.*)m',"Port=$serverport", $inicontent); //Problem, found Port= a serveral times
-	$inicontent = preg_replace('(^Password=.*)m',"Password=$serverpassword", $inicontent);
-	//Fixed QRG
-	$inicontent = preg_replace('(^TXFrequency=.*)m',"TXFrequency=433612500", $inicontent);
-	$inicontent = preg_replace('(^RXFrequency=.*)m',"RXFrequency=433612500", $inicontent);
-
-
-	//WRITE CONTENT INTO FILE MMDVM.INI	
-	if (is_writable($MMDVMINI) && isset($inicontent) ) {
-                $fh = fopen($MMDVMINI, 'w');
-                fwrite($fh,$inicontent);
-                fwrite($fh,"\n");
-                fclose($fh);
-	} else { echo '<div class="alert alert-danger">Sorry, /opt/MMDVMHost/MMDVM.ini is not writeable !</div>'; }
-
-	//REPLACE THE CONTENT OF IRCDDBGATEWAY
-	$irccontent = file_get_contents($IRCDDBCFG); 
-	$irccontent = preg_replace('(^gatewayCallsign=.*)m',"gatewayCallsign=$callsign", $irccontent);
-	$irccontent = preg_replace('(^description1=.*)m',"description1=[easyBM]", $irccontent);
-	$irccontent = preg_replace('(^description2=.*)m',"description2=$description", $irccontent);
-	$irccontent = preg_replace('(php?call=.*)m',"php\?call=$callsign", $irccontent);
-	$irccontent = preg_replace('(^frequency1=.*)m',"frequency1=433.6125", $irccontent);
-	$irccontent = preg_replace('(^frequency1=.*)m',"frequency1=433.6125", $irccontent);
-	$irccontent = preg_replace('(^ircddbUsername=.*)m',"ircddbUsername=$callsign", $irccontent);
-	$irccontent = preg_replace('(^dplusLogin=.*)m',"dplusLogin=$callsign", $irccontent);
-
-	//WRITE CONTENT INTO FILE IRCDDBGATEWAY
-        if (is_writable($IRCDDBCFG) && isset($irccontent) ) {
-                $fh = fopen($IRCDDBCFG, 'w');
-                fwrite($fh,$irccontent);
-                fwrite($fh,"\n");
-                fclose($fh);
-        } else { echo '<div class="alert alert-danger">Sorry, /etc/ircddbgateway is not writeable !</div>'; }	
+	$RXFrequency="433612500";
+	$TXFrequency="433612500";
 	
 	
+	$Warr = writeini($MMDVMINI,"DMR","Id",strval($id));
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"Info","Location",$location);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"Info","URL",$url);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"Info","Description",$description);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"DMR Network","Address",$serveraddress);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"DMR Network","Port",$serverport);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"DMR Network","Password",$serverpassword);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }	
+	$Warr = writeini($MMDVMINI,"Info","RXFrequency",$RXFrequency);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"Info","TXFrequency",$TXFrequency);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	$Warr = writeini($MMDVMINI,"General","Callsign",$callsign);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { exit; }
+	
+	//ini_write($Warr, $MMDVMINI, $maxdepth=3);
+
 	//DO THE WIFI CONFIGURATION
 	//UPS
-	system('sudo sed -i -e \'s/psk=.*/psk="'.$psk.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
-	system('sudo sed -i -e \'s/ssid=.*/ssid="'.$ssid.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
+	//system('sudo sed -i -e \'s/psk=.*/psk="'.$psk.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
+	//system('sudo sed -i -e \'s/ssid=.*/ssid="'.$ssid.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
 	echo '<pre>';
 	//system('sudo wpa_cli list_networks',$returncode);
 	//system('sudo wpa_cli set_network 0 ssid "'.$ssid.'"',$returncode);
@@ -188,7 +278,6 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	//system('sudo wpa_cli save_config', $returncode);
 	echo '</pre>';
 	
-
 	//DEBUG
 	//echo "<pre>";
 	//var_dump($inicontent);
@@ -199,7 +288,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 	<?php  if ( $reboot== "YES") : ?>
 		<div class="alert alert-danger">
-		 <button onclick="window.location.href='/init.php?function=reboot'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Perform a system reboot </button>&nbsp;To activate the changes, please restart your new easyBM Hotspot!
+		 <button onclick="window.location.href='/init.php?function=reboot'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately !
         <!-- <button onclick="window.location.href='/MMDVMHost-Dashboard/scripts/reboot.php'" type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Reboot your system, now!</button> -->
 
 		</div>
@@ -210,25 +299,21 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	<?php endif; ?>
 
 		<div class="list-group">
-		<a href="#" class="list-group-item active">Your system settings:</a>
+		<a href="#" class="list-group-item active">Your DVMega System settings for BrandMeister:</a>
 		<a href="#" class="list-group-item">Configuration File at &nbsp;<?php echo $MMDVMINI;?></a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Callsign=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your Callsign</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Id=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your DMR ID</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Location=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your location</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^URL=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp;is your website</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Description=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp; is your description</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Address=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp; is your DMR Master Server</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^Password=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp; is the Password</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^TXFrequency=.*$/p' $MMDVMINI " ))[1]; ?>&nbsp; is your Hotspot frequency</a>
-		<a href="#" class="list-group-item"><?php echo explode('=',exec("/bin/sed -n '/^gatewayCallsign=.*$/p' $IRCDDBCFG " ))[1]; ?>_G &nbsp; is your D-Star Gateway Callsign</a>
-		<a href="<?php echo explode('=',exec("/bin/sed -n '/^url=.*$/p' $IRCDDBCFG " ))[1]; ?>" class="list-group-item" target="_blank">&nbsp; Check your ircddb Status</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"General","Callsign") ?>&nbsp;is your Callsign</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR","Id") ?>&nbsp;is your DMR ID</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Location") ?>&nbsp;is your location</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","URL") ?>&nbsp;is your website</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Description") ?>&nbsp; is your description</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Address") ?> &nbsp; is your DMR Master</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Password") ?>&nbsp; is the Password</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","TXFrequency") ?>&nbsp; is your Hotspot frequency</a>
 		</div>
-		<p>We believe it makes sense, if each hotspot using the same frequency. Therefore, your QRG was set to 433.6125MHz.</p>
+		<p>We believe it makes sense if each hotspot using the same frequency. Therefore, this was set to 433.6125MHz.</p>
 		<br />
-
-		<p class="text-center text-muted">Thank´s for using easyBM, it is a BrandMeister Germany Project. If you like, please make a donation.</p>
-		<center>
-		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+		<p>Make a Donation, if you like.</p>
+		<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
 		 <input type="hidden" name="cmd" value="_donations">
 		 <input type="hidden" name="business" value="denis.bederov@gmx.de">
 		 <input type="hidden" name="lc" value="EN">
@@ -239,49 +324,46 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		 <input type="image" src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal Donation">
 		 <img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
 		</form>
-		</center>
 		</div></div>
 
 	<?php
 
 	} else { ?>
-
-   	 <form class="form-horizontal" action="" method="post">
+       <form class="form-horizontal" action="" method="post">
 		<fieldset>
-
 		<legend>MMDVM Configuration</legend>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="callsign">Your Callsign</label>
-		  <div class="col-md-4">
-		  <input id="callsign" name="callsign" type="text" placeholder="DL0ABC" class="form-control input-md" required="">
+		  <div class="col-md-4"> 
+		  <input id="callsign" name="callsign" type="text" value="<?php print readini($MMDVMINI,"General","Callsign") ?>" placeholder="<?php print readini($MMDVMINI,"General","Callsign") ?>" class="form-control input-md" required="">
 		  <span class="help-block">This is your own callsign.</span>
 		  </div>
 		</div>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="id">Your DMR ID</label>
 		  <div class="col-md-4">
-		  <input id="id" name="id" type="text" placeholder="2621234" class="form-control input-md" required="">
+		  <input id="id" name="id" type="text" value="<?php print readini($MMDVMINI,"DMR","Id") ?>" placeholder="<?php print readini($MMDVMINI,"DMR","Id") ?>" class="form-control input-md" required="">
 		  <span class="help-block">This is your own DMR ID.</span>
 		  </div>
 		</div>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="location">Your Location</label>
 		  <div class="col-md-4">
-		  <input id="location" name="location" maxlength="20" type="text" placeholder="HamTown" class="form-control input-md" required="">
+		  <input id="location" name="location" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","Location") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Location") ?>" class="form-control input-md" required="">
 		  <span class="help-block">Let us know, where your are located.</span>
 		  </div>
 		</div>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="url">Your URL</label>
 		  <div class="col-md-4">
-		  <input id="url" name="url" maxlength="124" type="text" placeholder="https://www.qrz.com/db/callsign" class="form-control input-md" required="">
+		  <input id="url" name="url" maxlength="124" type="text" value="<?php print readini($MMDVMINI,"Info","URL") ?>" placeholder="<?php print readini($MMDVMINI,"Info","URL") ?>" class="form-control input-md" required="">
 		  <span class="help-block">For example, your QRZ.com webpage.</span>
 		  </div>
 		</div>
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="description">Description</label>
 		  <div class="col-md-4">
-		  <input id="description" name="description" maxlength="20" type="text" placeholder="[easyBM] Hotspot" class="form-control input-md" required="">
+		  <input id="description" name="description" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","Description") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Description") ?>" class="form-control input-md" required="">
 		  <span class="help-block">A very short description about your system.</span>
 		  </div>
 		</div>
@@ -290,21 +372,21 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		<div class="form-group">
                   <label class="col-md-4 control-label" for="serveraddress">Server Address</label>
                   <div class="col-md-4">
-                  <input id="serveraddress" name="serveraddress" type="text" value="master.up4dar.de" class="form-control input-md">
+                  <input id="serveraddress" name="serveraddress" type="text" value="<?php print readini($MMDVMINI,"DMR Network","Address") ?>" placeholder="<?php print readini($MMDVMINI,"DMR Network","Address") ?>" class="form-control input-md">
                   <span class="help-block">The DMR Master server IP-Address or hostname.</span>
                   </div>
                 </div>
 		<div class="form-group">
                   <label class="col-md-4 control-label" for="serverport">Server Port</label>
                   <div class="col-md-4">
-                  <input id="serverport" name="serverport" type="text" value="62031" class="form-control input-md">
+                  <input id="serverport" name="serverport" type="text" value="<?php print readini($MMDVMINI,"DMR Network","Port") ?>" placeholder="<?php print readini($MMDVMINI,"DMR Network","Port") ?>" class="form-control input-md">
                   <span class="help-block">The DMR Master server port.</span>
                   </div>
                 </div>
 		<div class="form-group">
                   <label class="col-md-4 control-label" for="serverpassword">Server Password</label>
                   <div class="col-md-4">
-                  <input id="serverpassword" name="serverpassword" type="text" value="passw0rd" class="form-control input-md">
+                  <input id="serverpassword" name="serverpassword" type="text" value="<?php print readini($MMDVMINI,"DMR Network","Password") ?>" placeholder="<?php print readini($MMDVMINI,"DMR Network","Password") ?>" class="form-control input-md">
                   <span class="help-block">The DMR Master server password.</span>
                   </div>
                 </div>
@@ -354,7 +436,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 <hr>
 	<footer>
-	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2016-08-10, by BM-Team Germany)</small><br />
+	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2017-02-13, by BM-Team Germany)</small><br />
 	 <small>Uptime for this host is <?php print(shell_exec('uptime')); ?></small>
 	</footer>
 
