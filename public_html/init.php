@@ -138,13 +138,28 @@ function ini_write($_data, $filename, $maxdepth=3)
  
     return true;
 }
+
+function geo_location()
+    {
+       
+    $externalContent = file_get_contents('http://checkip.dyndns.com/');
+	 preg_match('/\b(?:\d{1,3}\.){3}\d{1,3}\b/', $externalContent, $m);
+    $externalIp = $m[0];
+   
+    $location = unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$externalIp));
+    
+    //print $externalIp;
+         
+    return $location;
+    }
+
  
 #===================================================================================================
 
 //THE RESTART THING
 if (isset($_GET['function'])){ $function=$_GET['function']; } else { $function="nofunction"; }
  if ($function=='restart'){
-	echo '<div class="alert alert-danger">Service is restarting, now! </div>';
+	echo '<div class="alert alert-danger">Service is restarted, <strong>Press button Home!</strong> </div>';
 	exec('/bin/sleep 3 && sudo systemctl restart mmdvmhost.service > /dev/null 2>&1');
 	echo '<div window.location.href=\'/init.php\' </div>';
  }
@@ -179,10 +194,14 @@ function restart() {
 
 <div class="container">
     <div class="jumbotron">
-    <img alt="" border="0" src="BM_Sticker.png" width="225" height="auto">
-      <h1>easyBM <small>initalize your DVMega System</small></h1>
-      <p><small>Enter some data, and your are ready to go for the digital ham radio network</small> <strong>BrandMeister</strong>.<a href="#" class="" data-toggle="modal" data-target="#myModal"> <small>(Show MMDVM.ini)</small> </a></p>
-		
+    <div align="center"><img alt="" border="0" src="ebm.jpg" width="300" height="auto"></div>
+      <h2>easyBM <small>initalize your DVMega System</small></h2>
+      <p><small>Enter some data, and your are ready to go for the digital ham radio network</small> <strong>BrandMeister</strong>.<a href="#" class="" data-toggle="modal" data-target="#myModal"> <small>(Show MMDVM.ini)</small></a></p>
+		  	<button onclick="window.location.href='./MMDVMHost-Dashboard/index.php'"  type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;Home</button>
+  			<button onclick="window.location.href='./MMDVMHost-Dashboard/scripts/rebootmmdvm.php'"  type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>&nbsp;Reboot MMDVMHost</button>
+  			<button onclick="window.location.href='./MMDVMHost-Dashboard/scripts/reboot.php'"  type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Reboot System</button>
+  			<button onclick="window.location.href='./MMDVMHost-Dashboard/scripts/halt.php'"  type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp;ShutDown System</button>
+         
 <!-- Show Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -233,6 +252,20 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	$psk = ( $_POST['psk'] ? $_POST['psk'] : 'DummyKey');
 	$rxfrequency = ( $_POST['rxfrequency'] ? $_POST['rxfrequency'] : '433612500');
 	$txfrequency = ( $_POST['txfrequency'] ? $_POST['txfrequency'] : '433612500');
+	
+	
+		$Latitude = ( $_POST['Latitude'] ? $_POST['Latitude'] : '0.0');
+		$Longitude = ( $_POST['Longitude'] ? $_POST['Longitude'] : '0.0');
+	
+	if (isset($_POST["autogeo"])) {
+  		$geoA = geo_location();
+		$Latitude=$geoA['geoplugin_latitude'];
+   	$Longitude=$geoA['geoplugin_longitude'];
+	}
+	else {
+  		$autogeo=false;
+	}	
+	
 	$dmrtxlevel = ( $_POST['dmrtxlevel'] ? $_POST['dmrtxlevel'] : '50');
 	
 
@@ -250,6 +283,16 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	$rxfrequency=trim($rxfrequency);
 	$txfrequency=trim($txfrequency); 
 	$dmrtxlevel=trim($dmrtxlevel);
+	// Plausi Prüfung frequenz und TX Power
+	if ((strlen($rxfrequency) != 9 ) || (strpos ($rxfrequency,',') != false) || (strpos ($rxfrequency,'.') != false)){
+		$rxfrequency="433612500";
+	}
+	if ((strlen($txfrequency) != 9 ) || (strpos ($txfrequency,',') != false) || (strpos ($txfrequency,'.') != false)){
+		$txfrequency="433612500";
+	}
+	if ((intval ($dmrtxlevel) > 100 ) || (intval  ($dmrtxlevel) <= 0)){
+		$dmrtxlevel="50";
+	}
 
 	//REPLACE THE CONTENT IN MMDVM.INI	
 	//$RXFrequency="433612500";
@@ -260,6 +303,13 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"Info","Location",$location);
 	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) { echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
+
+	$Warr = writeini($MMDVMINI,"Info","Latitude",$Latitude);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) {echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
+	$Warr = writeini($MMDVMINI,"Info","Longitude",$Longitude);
+	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) {echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
+
+
 	$Warr = writeini($MMDVMINI,"Info","URL",$url);
 	if (ini_write($Warr, $MMDVMINI, $maxdepth=3) != true) {echo htmlspecialchars(print_r(error_get_last(),1)) . "\r\n"; exit; }
 	$Warr = writeini($MMDVMINI,"Info","Description",$description);
@@ -288,8 +338,10 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 	
 	//DO THE WIFI CONFIGURATION
 	//UPS
-	//system('sudo sed -i -e \'s/psk=.*/psk="'.$psk.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
-	//system('sudo sed -i -e \'s/ssid=.*/ssid="'.$ssid.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
+	if( strcmp ( $ssid,"Dummy") != 0) {
+		system('sudo sed -i -e \'s/psk=.*/psk="'.$psk.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
+		system('sudo sed -i -e \'s/ssid=.*/ssid="'.$ssid.'"/g\' /etc/wpa_supplicant/wpa_supplicant.conf',$returncode);
+	}
 	echo '<pre>';
 	//system('sudo wpa_cli list_networks',$returncode);
 	//system('sudo wpa_cli set_network 0 ssid "'.$ssid.'"',$returncode);
@@ -310,14 +362,9 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 	<?php  if ( $reboot== "YES") : ?>
 		<div class="alert alert-danger">
-		<!-- <button onclick="restart()" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately ! -->		 
-		<button onclick="window.location.href='/init.php'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp;Please Restart your Service, immediately ! 
-        <!-- <button onclick="window.location.href='/MMDVMHost-Dashboard/scripts/reboot.php'" type="button" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Reboot your system, now!</button> -->
+		<button onclick="window.location.href='/init.php?function=restart'" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;Restart Service</button>&nbsp; Restart!! For WLAN changes, Press Reboot Button !		 
 		</div>
-		<?php //echo '<div class="alert alert-danger">Service is restarting, now! </div>';
-				exec('sudo systemctl restart mmdvmhost.service > /dev/null 2>&1');
-		      exec('sudo rm -f /var/www/html/UNCONFIGURED'); ?>
-
+		<?php exec('sudo rm -f /var/www/html/UNCONFIGURED'); ?>
 	<?php else: ?>
 		<center><a href="/init.php" class="btn btn-warning">Sorry, please try again !</a></center><br />
 	<?php endif; ?>
@@ -328,13 +375,17 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"General","Callsign") ?>&nbsp;is your Callsign</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR","Id") ?>&nbsp;is your DMR ID</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Location") ?>&nbsp;is your location</a>
+		
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Latitude") ?>&nbsp;is your Latitude</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Longitude") ?>&nbsp;is your Longitude</a>
+		
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","URL") ?>&nbsp;is your website</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","Description") ?>&nbsp; is your description</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Address") ?> &nbsp; is your DMR Master</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"DMR Network","Password") ?>&nbsp; is the Password</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","TXFrequency") ?>&nbsp; is your Hotspot TX frequency</a>
 		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Info","RXFrequency") ?>&nbsp; is your Hotspot RX frequency</a>
-		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Modem","DMRTXLevel").'%' ?>&nbsp; is your Hotspot DMR TX Level</a>
+		<a href="#" class="list-group-item"><?php print readini($MMDVMINI,"Modem","DMRTXLevel").'%' ?>&nbsp; is your Hotspot DMR TX Level in %</a>
 		</div>
 		<p>We believe it makes sense if each hotspot using the same frequency. Therefore, this was set to 433.6125MHz.</p>
 		<br />
@@ -356,6 +407,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 	} else { ?>
        <form class="form-horizontal" action="" method="post">
+       <br />
 		<fieldset>
 		<legend>MMDVM Configuration</legend>
 		<div class="form-group">
@@ -379,6 +431,34 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 		  <span class="help-block">Let us know, where your are located.</span>
 		  </div>
 		</div>
+		
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="Latitude">Geo Latitude</label>
+		  <div class="col-md-4">
+		  <input id="Latitude" name="Latitude" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","Latitude") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Latitude") ?>" class="form-control input-md" required="">
+		  <span class="help-block">Tell us your Geo Latitude.<br />You can find help at:<br />https://www.laengengrad-breitengrad.de </span>
+		  </div>
+		</div>
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="Longitude">Geo Longitude</label>
+		  <div class="col-md-4">
+		  <input id="Longitude" name="Longitude" maxlength="20" type="text" value="<?php print readini($MMDVMINI,"Info","Longitude") ?>" placeholder="<?php print readini($MMDVMINI,"Info","Longitude") ?>" class="form-control input-md" required="">
+		  <span class="help-block">Tell us your Geo Longitude.<br />You can find help at:<br />https://www.laengengrad-breitengrad.de</span>
+		  </div>
+		</div>		
+		
+		
+		<div class="form-group">
+		  <label class="col-md-4 control-label" for="autogeo">   </label>
+		  <div class="col-md-4">
+        <input type="checkbox" id="autogeo" value="false" name="autogeo"> <label for="autogeo">  We try to get your location +-50Km (Beta)</label><br>
+		  <span class="help-block"></span>
+		  </div>
+		</div>
+		
+		
+		
+		
 		<div class="form-group">
 		  <label class="col-md-4 control-label" for="url">Your URL</label>
 		  <div class="col-md-4">
@@ -485,7 +565,7 @@ if (isset($_POST['submited']) && $_POST['submited'] == true) {
 
 <hr>
 	<footer>
-	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2017-02-14, by BM-Team Germany)</small><br />
+	 <small>For more informations, please have a look at the BrandMeister Webpage. (Version 2017-02-24, by BM-Team Germany)</small><br />
 	 <small>Uptime for this host is <?php print(shell_exec('uptime')); ?></small>
 	</footer>
 
