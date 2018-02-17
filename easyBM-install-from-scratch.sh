@@ -18,7 +18,9 @@ localipaddr=`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 
 # Define functions
 function pause(){
  echo
- read -n1 -rsp $" Check the previous printout and press space to continue or Ctrl+C to abort !"
+ #read -n1 -rsp $" Check the previous printout and press space to continue or Ctrl+C to abort !"
+ echo "Check the previous printout"
+ sleep 5
  echo
 }
 
