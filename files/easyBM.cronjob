@@ -4,8 +4,6 @@
 #MAIL Recipient
 #MAILTO=root
 #
-# Sende Info eMail at Startup
-@reboot root /opt/easyBM/easyBM-send-startup-info.sh > /dev/null 2>&1
 #Restart MMDVMHost daily at 00:00
 #0 0 * * * root /bin/systemctl restart mmdvmhost.service >/dev/null 2>&1
 #update ping database
@@ -16,18 +14,13 @@
 */90 * * * * root /usr/bin/nice /usr/bin/wget -O /etc/YSFGateway/YSFHosts.txt http://register.ysfreflector.de/export_csv.php >/dev/null 2>&1
 #MMDVM Connection Problem to Master 
 * * * * * root /usr/bin/tail -20 /mnt/ramdisk/MMDVM-`/bin/date -I`.log | /bin/grep -i "Socket has failed when writing data to the master" && /bin/systemctl restart mmdvmhost.service > /mnt/ramdisk/lastrun.check.log 2>&1
-#
-# check if process is there
-0/10 * * * * root /usr/bin/pgrep ircddbgatewayd || /etc/init.d/ircddbgateway start > /dev/null 2>&1
 # check if process is there
 0/10 * * * * root /usr/bin/pgrep MMDVM || /bin/systemctl restart mmdvmhost.service > /dev/null 2>&1
 # check if process is there
 0/10 * * * * root /usr/bin/pgrep YSFGateway || /etc/init.d/ysfgateway start >/dev/null 2>&1
 #create PNG for vnstati
 */15 * * * * root /usr/bin/nice /opt/easyBM/vnstati.sh >/dev/null 2>&1
-
-#
 #Delete Logfiles after 7 days in /mnt/ramdisk, for 24x7 operation like a repeater
 0 0 * * * root /usr/bin/find /mnt/ramdisk/ -xdev -type f -mtime +7 -exec rm -f {} \;
-
-
+#weekly update the OS
+47 11 * * 0 root /usr/bin/apt update && /usr/bin/apt -y upgrade && /usr/bin/apt autoremove

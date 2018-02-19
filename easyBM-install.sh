@@ -11,7 +11,7 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-set -x
+#set -x
 
 
 # Define Variables
@@ -43,33 +43,37 @@ check_result() {
 #START 
 #
 clear
-echo 
-echo 
+echo -e "\e[48;5;220m                                      "
+echo "                                      "
+echo "                       ____  __  __   "
+echo "   ___  __ _ ___ _   _| __ )|  \/  |  "
+echo "  / _ \/ _  / __| | | |  _ \| |\/| |  "
+echo " |  __/ (_| \__ \ |_| | |_) | |  | |  "
+echo "  \___|\__,_|___/\__| |____/|_|  |_|  "
+echo "                 |___/                "
+echo "                                      "
+echo -e "\e[48;5;208m                                      "
+echo "                                      "
+echo "  easyBM is based on an idear of the  "
+echo "  German BrandMeister Support-Team    "
+echo "                                      " 
+echo "   Licenced under the GNU Licence     " 
+echo " ************************************ "
+echo " *   FOR INTERNAL USE ONLY          * "
+echo " ************************************ "
+echo "                                      "
+echo -e "\e[48;5;196m                                      "
+echo "                                      "
+echo " easyBM is a community effort of      "
+echo " 3 radio amateurs from Germany who    "
+echo " have created this solution out of    "
+echo " joy in the hobby                     "
+echo "                                      "
+echo " Support this BM project at           "
+echo " github.com/dl5rfk/easyBM.git         "
+echo "                                      "
+echo -e "\e[0m                                              "
 echo
-echo "                       ____  __  __ "
-echo "   ___  __ _ ___ _   _| __ )|  \/  |"
-echo "  / _ \/ _  / __| | | |  _ \| |\/| |"
-echo " |  __/ (_| \__ \ |_| | |_) | |  | |"
-echo "  \___|\__,_|___/\__| |____/|_|  |_|"
-echo "                 |___/              "
-echo 
-echo "  easyBM is based on an idear of the"
-echo "  German BrandMeister Support-Team  "
-echo 
-echo "  Licenced under the GNU Licence " 
-echo "************************************"
-echo "*   FOR INTERNAL USE ONLY          *"
-echo "************************************"
-echo
-echo " Found.... $arch as Architecture"
-echo " Found.... $release as OS Release"
-echo " Found.... $codename as Codename"
-echo " Found.... $memory KB Memory"
-echo
-echo
-echo
-pause
-
 echo -e "\n\n +++ We do some checks ...."
 sleep 1
 if [ ! $( id -u ) -eq 0 ]; then
@@ -83,14 +87,13 @@ fi
 if [ ! -d "/opt/easyBM/" ]; then
   echo "  ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
 fi
-# check directory
-if [ -d "/opt/MMDVMHost/" ]; then 
- echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 1;
-fi
-# check directory
-if [ -d "/opt/YSFClients/" ]; then 
- echo "  ERROR: MMDVMHost is already there, did you run $0 tice? "; exit 1; 
-fi
+# check apt
+if command -v apt-get &> /dev/null; then
+  echo "  Found.... apt"
+else
+  echo "  ERROR:  -apt-  not found !"
+  exit 0;
+fi 
 # Check easybm user account
 if [ ! -z "$(grep ^easybm: /etc/passwd)" ] && [ -z "$1" ]; then
     echo "  ERROR: user easybm exists"
@@ -105,6 +108,11 @@ if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
     echo 'Please remove easybm group before proceeding.'
     exit 1
 fi
+# chech interfaces
+availableInterfaces=$(ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1)
+ echo "Interface(s) "
+ echo "             ${availableInterfaces}"
+ echo "                                   are up an running"
 # Check Internet Access
 ping -c 3 google.com
 check_result $? '  ERROR, please make sure the Internet is reachable !!!'
@@ -282,58 +290,16 @@ if  [ ! -d '/opt/MMDVMCal' ]; then
  pause
 fi
 
-echo -e "\n\n +++ installing Webserver lighttpd\n"
- /usr/bin/sudo /usr/bin/apt -y install lighttpd php-cgi php
- /usr/bin/sudo lighty-enable-mod fastcgi
- /usr/bin/sudo lighty-enable-mod fastcgi-php
- /usr/bin/sudo service lighttpd restart
-if [ -f /var/www/html/index.html ]; then 
- /usr/bin/sudo rm -f /var/www/html/index.html
-fi
-if [ -f /var/www/html/index.lighttpd.html ]; then 
- /usr/bin/sudo rm -f /var/www/html/index.lighttpd.html
-fi
- /usr/bin/sudo usermod -a -G www-data pi
-## FIXME gpio gibts noch garnicht
-/usr/bin/sudo usermod -a -G gpio www-data
-## FIXME, checken ob es schon drin steht##
-## evtl mit sed
-
-
-/bin/grep -q "^www-data" /etc/sudoers
-if [ $? -gt 0 ]; then
- echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
-else
- echo "UPS, www-data found in /etc/sudoers, so whats next? FIXME"
-fi
-
-pause 
-
-echo -e "\n\n +++ installing vnstat and vnstati\n"
-echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
- /usr/bin/sudo /usr/bin/apt -y install vnstat vnstati php5-gd
- /usr/bin/sudo mkdir /var/www/html/vnstati
- /usr/bin/sudo wget http://j0hn.uk/vnstati/template.html -O /var/www/html/vnstati/index.html
-pause
-
-if  [! -d "/opt/MMDVMCal" ]; then
-echo -e "\n\n +++ installing MMDVMCal\n"
-cd /opt
-/usr/bin/sudo git clone https://github.com/g4klx/MMDVMCal.git
-cd /opt/MMDVMCal
-/usr/bin/sudo make all
-fi
-
-if  [! -d "/opt/MMDVMHost" ]; then
-echo -e "\n\n +++ installing MMDVMHost\n"
-cd /opt
-/usr/bin/sudo git clone https://github.com/g4klx/MMDVMHost.git
-cd /opt/MMDVMHost
-/usr/bin/sudo make clean all
-/usr/bin/sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
-/usr/bin/sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
-/usr/bin/sudo ln -s /opt/MMDVMHost/MMDVM.ini /etc/MMDVM.ini
-echo -e "\n\n +++ installing MMDVMHost systemd Service \n"
+if  [ ! -d "/opt/MMDVMHost" ]; then
+ echo -e "\n\n +++ installing MMDVMHost\n"
+  cd /opt
+   /usr/bin/sudo git clone https://github.com/g4klx/MMDVMHost.git
+  cd /opt/MMDVMHost
+   /usr/bin/sudo make clean all
+   /usr/bin/sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
+   /usr/bin/sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
+   /usr/bin/sudo ln -s /opt/MMDVMHost/MMDVM.ini /etc/MMDVM.ini
+ echo -e "\n\n +++ installing MMDVMHost systemd Service \n"
 echo " 
 [Unit]
 Description=MMDVM Host Service
@@ -370,42 +336,75 @@ WantedBy=multi-user.target
 pause 
 fi
 
+if [ ! -d '/opt/YSFClients/']; then 
+ echo -e "\n\n +++ installing C4FM YSF Software\n"
+  cd /opt
+   /usr/bin/sudo git clone https://github.com/g4klx/YSFClients.git
+  cd /opt/YSFClients/YSFGateway
+   /usr/bin/sudo make clean all
+   /usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
+   /usr/bin/sudo mkdir /etc/YSFGateway 
+   /usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway.ini /etc/YSFGateway/
+   /usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFHosts.txt /etc/YSFGateway/
+   /usr/bin/sudo wget -O /etc/YSFGateway/YSFHosts.txt http://register.ysfreflector.de/export_csv.php
+   /usr/bin/sudo groupadd mmdvm && /usr/bin/sudo useradd mmdvm -g mmdvm -s /sbin/nologin
+   #
+   /usr/bin/sudo mkdir -p /var/log/YSFGateway
+   ##FIXME, die gurppe gibt es nicht##
+   /usr/bin/sudo chgrp mmdvm /var/log/YSFGateway
+   /usr/bin/sudo chmod g+w /var/log/YSFGateway
+   #
+   /usr/bin/sudo mkdir -p /mnt/ramdisk/YSFGateway
+   /usr/bin/sudo chgrp mmdvm /mnt/ramdisk/YSFGateway
+   /usr/bin/sudo chmod g+w /mnt/ramdisk/YSFGateway
+   #
+   /usr/bin/sudo cp -f /opt/easyBM/files/YSFGateway.init /etc/init.d/YSFGateway
+   /usr/bin/sudo chmod 755 /etc/init.d/YSFGateway
+   /usr/bin/sudo update-rc.d YSFGateway defaults
+   /usr/bin/sudo update-rc.d YSFGateway enable
+pause
+fi
+
+echo -e "\n\n +++ installing Webserver lighttpd\n"
+ /usr/bin/sudo /usr/bin/apt -y install lighttpd php-cgi php
+ /usr/bin/sudo lighty-enable-mod fastcgi
+ /usr/bin/sudo lighty-enable-mod fastcgi-php
+ /usr/bin/sudo service lighttpd restart
+if [ -f /var/www/html/index.html ]; then 
+ /usr/bin/sudo rm -f /var/www/html/index.html
+fi
+if [ -f /var/www/html/index.lighttpd.html ]; then 
+ /usr/bin/sudo rm -f /var/www/html/index.lighttpd.html
+fi
+ /usr/bin/sudo usermod -a -G www-data pi
+## FIXME gpio gibts noch garnicht
+/usr/bin/sudo usermod -a -G gpio www-data
+## FIXME, checken ob es schon drin steht##
+## evtl mit sed
+
+
+/bin/grep -q "^www-data" /etc/sudoers
+if [ $? -gt 0 ]; then
+ echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
+else
+ echo "UPS, www-data found in /etc/sudoers, so whats next? FIXME"
+fi
+
 
 echo -e "\n\n +++ installing MMDVMHost-Dashboard\n"
-cd /var/www/html/
-/usr/bin/sudo git clone https://github.com/dg9vh/MMDVMHost-Dashboard.git 
-/usr/bin/sudo chown -Rv www-data:www-data /var/www/html/MMDVMHost-Dashboard/*
-
+ cd /var/www/html/
+  /usr/bin/sudo git clone https://github.com/dg9vh/MMDVMHost-Dashboard.git 
+  /usr/bin/sudo chown -Rv www-data:www-data /var/www/html/MMDVMHost-Dashboard/*
 pause 
 
-echo -e "\n\n +++ installing C4FM YSF Software\n"
-cd /opt
-/usr/bin/sudo git clone https://github.com/g4klx/YSFClients.git
-cd /opt/YSFClients/YSFGateway
-/usr/bin/sudo make clean all
-/usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway /usr/local/bin/
-/usr/bin/sudo mkdir /etc/YSFGateway 
-/usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFGateway.ini /etc/YSFGateway/
-/usr/bin/sudo cp -f /opt/YSFClients/YSFGateway/YSFHosts.txt /etc/YSFGateway/
-/usr/bin/sudo wget -O /etc/YSFGateway/YSFHosts.txt http://register.ysfreflector.de/export_csv.php
-#
-/usr/bin/sudo groupadd mmdvm && /usr/bin/sudo useradd mmdvm -g mmdvm -s /sbin/nologin
-#
-/usr/bin/sudo mkdir -p /var/log/YSFGateway
-##FIXME, die gurppe gibt es nicht##
-/usr/bin/sudo chgrp mmdvm /var/log/YSFGateway
-/usr/bin/sudo chmod g+w /var/log/YSFGateway
-#
-/usr/bin/sudo mkdir -p /mnt/ramdisk/YSFGateway
-/usr/bin/sudo chgrp mmdvm /mnt/ramdisk/YSFGateway
-/usr/bin/sudo chmod g+w /mnt/ramdisk/YSFGateway
-#
-/usr/bin/sudo cp -f /opt/easyBM/files/YSFGateway.init /etc/init.d/YSFGateway
-/usr/bin/sudo chmod 755 /etc/init.d/YSFGateway
-/usr/bin/sudo update-rc.d YSFGateway defaults
-/usr/bin/sudo update-rc.d YSFGateway enable
 
+echo -e "\n\n +++ installing vnstat and vnstati\n"
+echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
+ /usr/bin/sudo /usr/bin/apt -y install vnstat vnstati php5-gd
+ /usr/bin/sudo mkdir /var/www/html/vnstati
+ /usr/bin/sudo wget http://j0hn.uk/vnstati/template.html -O /var/www/html/vnstati/index.html
 pause
+
 
 echo -e "\n\n +++ setting up the os system\n"
 /usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
@@ -426,6 +425,9 @@ echo -e "\n\n +++ setting up the os system\n"
 /usr/bin/sudo /bin/sed -i '/cron/s/^/#/' /etc/rsyslog.conf
 /usr/bin/sudo /bin/sed -i '/rotate/s/[0-9]/2/' /etc/logrotate.conf
 pause 
+
+echo -e "\n\n +++ setting up Firewall\n"
+$(command -v iptables) -C INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 
 echo -e "\n\n +++ prepare for the first use\n"
 /usr/bin/sudo touch /var/www/html/UNCONFIGURED
