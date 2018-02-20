@@ -111,8 +111,8 @@ fi
 # chech interfaces
 availableInterfaces=$(ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1)
  echo "Interface(s) "
- echo "             ${availableInterfaces}"
- echo "                                   are up an running"
+ echo "  ${availableInterfaces}"
+ echo "  are up an running"
 # Check Internet Access
 ping -c 3 google.com
 check_result $? '  ERROR, please make sure the Internet is reachable !!!'
@@ -132,96 +132,103 @@ pause
 echo -e "\n\n +++ Update and Upgrade the OS \n"
 /usr/bin/sudo /usr/bin/apt update && /usr/bin/sudo /usr/bin/apt -y upgrade 
 check_result $? ' Sorry,..... /usr/bin/apt upgrade failed'
-pause
 
-echo -e "\n\n +++ installing some Tools, like git gcc make vim wget and more...\n"
+
+echo -e "\n\n +++ Update rpi software \n"
+/usr/bin/sudo /usr/bin/rpi-update
+
+echo -e "\n\n +++ installing some Tools...\n"
 # Check wget
-if [ ! -e '/usr/bin/wget' ]; then
+if [ ! $(command -v wget) ]; then
     /usr/bin/apt -y install wget
-    check_result $? "  Sorry, can't install wget. Please install it."
+    check_result $? "  Sorry, can't install wget. "
 fi
 # Check make
-if [ ! -e '/usr/bin/make' ]; then
+if [ ! $(command -v make) ]; then
     /usr/bin/apt -y install make
-    check_result $? "  Sorry, can't install make. Please install it."
+    check_result $? "  Sorry, can't install make. "
 fi
 # Check screen
-if [ ! -e '/usr/bin/screen' ]; then
+if [ ! $(command -v screen) ]; then
     /usr/bin/apt -y install screen
-    check_result $? "  Sorry, can't install screen. Please install it."
+    check_result $? "  Sorry, can't install screen."
 fi
 # Check curl
-if [ ! -e '/usr/bin/curl' ]; then
+if [ ! $(command -v curl) ]; then
     /usr/bin/apt -y install curl
-    check_result $? "  Sorry, can't install curl. Please install it."
+    check_result $? "  Sorry, can't install curl. "
 fi
 # Check whiptail 
-if [ ! -e '/usr/bin/whiptail' ]; then
+if [ ! $(command -v whiptail) ]; then
     /usr/bin/apt -y install whiptail
-    check_result $? "  Sorry, can't install whiptail. Please install it."
+    check_result $? "  Sorry, can't install whiptail. "
 fi
 # Check gcc
-if [ ! -e '/usr/bin/gcc' ]; then
+if [ ! $(command -v gcc) ]; then
     /usr/bin/apt -y install gcc
-    check_result $? "  Sorry, can't install gcc. Please install it."
+    check_result $? "  Sorry, can't install gcc."
 fi 
 # Check g++
-if [ ! -e '/usr/bin/g++' ]; then
+if [ ! $(command -v g++) ]; then
     /usr/bin/apt -y install g++
-    check_result $? "  Sorry, can't install g++. Please install it."
+    check_result $? "  Sorry, can't install g++. "
 fi
 # Check git
-if [ ! -e '/usr/bin/git' ]; then
+if [ ! $(command -v git) ]; then
     /usr/bin/apt -y install git
-    check_result $? "  Sorry, can't install git. Please install it."
+    check_result $? "  Sorry, can't install git. "
 fi
 # Check vim
-if [ ! -e '/usr/bin/vim' ]; then
+if [ ! $(command -v vim) ]; then
     /usr/bin/apt -y install vim
-    check_result $? "  Sorry, can't install vim. Please install it."
+    check_result $? "  Sorry, can't install vim. "
 fi
 # Check nano
-if [ ! -e '/usr/bin/nano' ]; then
+if [ ! $(command -v nano) ]; then
     /usr/bin/apt -y install nano
-    check_result $? "  Sorry, can't install nano. Please install it."
+    check_result $? "  Sorry, can't install nano. "
 fi
 # Check rrdtool
-if [ ! -e '/usr/bin/rrdtool' ]; then
+if [ ! $(command -v rrdtool) ]; then
     /usr/bin/apt -y install rrdtool
-    check_result $? "  Sorry, can't install rrdtool. Please install it."
+    check_result $? "  Sorry, can't install rrdtool. "
 fi
 # Check  rsync
-if [ ! -e '/usr/bin/rsync' ]; then
+if [ ! $(command -v rsync) ]; then
     /usr/bin/apt -y install rsync
-    check_result $? "  Sorry, can't install rsync. Please install it."
+    check_result $? "  Sorry, can't install rsync. "
 fi
 # Check screenfetch
-if [ ! -e '/usr/bin/screenfetch' ]; then
+if [ ! $(command -v screenfetch) ]; then
     /usr/bin/apt -y install screenfetch
-    check_result $? "  Sorry, can't install screenfetch Please install it."
+    check_result $? "  Sorry, can't install screenfetch. "
 fi
 # Check nodejs
-if [ ! -e '/usr/bin/nodejs' ]; then
+if [ ! $(command -v nodejs) ]; then
     /usr/bin/apt -y install nodejs
-    check_result $? "  Sorry, can't install nodejs. Please install it."
+    check_result $? "  Sorry, can't install nodejs. "
 fi
 # Check wicd-curses
-if [ ! -e '/usr/bin/wicd-curses' ]; then
+if [ ! $(command -v wicd-curses) ]; then
     /usr/bin/apt -y install wicd-curses
-    check_result $? "  Sorry, can't install wicd-curses. Please install it."
+    check_result $? "  Sorry, can't install wicd-curses. "
 fi
 # and some more....
-/usr/bin/sudo /usr/bin/apt -y install build-essential net-tools ntp usbutils dnsutils iptraf
+/usr/bin/sudo /usr/bin/apt -y install build-essential net-tools ntp usbutils dnsutils 
 
 pause
 
 echo -e "\n\n +++ disabling  bluetooth\n"
-/bin/grep -i "dtoverlay=pi3-disable-bt" /boot/config.txt
-if [ $? -ne 0 ]; then 
-  /usr/bin/sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
-fi
-   /bin/grep -i "dtoverlay=pi3-disable-bt" /boot/config.txt
-   check_result $? "  Sorry, bluetooth is not disabled. "
+# /bin/grep -i -q "dtoverlay=pi3-disable-bt" /boot/config.txt
+# if [[ $? -eq 0 ]]; then
+#   echo "...found, bluetooth is disabled"
+# else
+#   echo "...not.found, we have to disable blootooth"
+#   /usr/bin/sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
+# fi
+   /usr/bin/sudo bash -c 'echo -e "#Bluetooth deactivation\ndtoverlay=pi3-disable-bt" >> /boot/config.txt'
+
+
 
 echo -e "\n\n +++ checking /dev/ttyAMA0\n"
 ls /dev/ttyAMA0
@@ -260,14 +267,14 @@ echo -e "\n\n +++ installing ntpdate\n"
  echo '#!/bin/sh' > /etc/cron.daily/ntpdate
  echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
  chmod 755 /etc/cron.daily/ntpdate
- /usr/bin/sudo $(which ntpdate) -s pool.ntp.org
+ /usr/bin/sudo $(command -v ntpdate) -s pool.ntp.org
  #/usr/bin/sudo /bin/systemctl enable systemd-timesyncd
  #/usr/bin/sudo /bin/systemctl restart systemd-timesyncd
- /usr/bin/sudo /bin/systemctl status systemd-timesyncd
+ #/usr/bin/sudo /bin/systemctl status systemd-timesyncd
 pause
 fi
 
-if [ ! -d '/mnt/ramdisk' ] || [ ! -d '/mnt/pendrive' ] || [ ! -d '/mnt/diskdrive' ]; then
+if [ ! -d '/mnt/ramdisk' ]; then
   echo -e "\n\n +++ installing ramdisk\n" 
    /usr/bin/sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
    /bin/grep -q ramdisk /etc/fstab
@@ -277,7 +284,6 @@ if [ ! -d '/mnt/ramdisk' ] || [ ! -d '/mnt/pendrive' ] || [ ! -d '/mnt/diskdriv
   else
     echo -e "\n\n +++ Found ramdisk in fstab, OK. Continue....\n"
   fi
-
 pause
 fi
 
