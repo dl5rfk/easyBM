@@ -12,7 +12,7 @@ Your can use  our prebuild SD-Card image. You can find it at our german website 
 But, if you think it is a good idea to build it step-by-step, you can clone from the repo.  
 
 ### Requirements
-* Raspbian jessie light Image [https://www.raspberrypi.org/downloads/raspbian/](Download page)
+* Raspbian Image [https://www.raspberrypi.org/downloads/raspbian/](Download page)
 * git
 * Linux basic skills
 * And all together  up and running for the next step.
@@ -23,17 +23,17 @@ Go to the Website [https://www.raspberrypi.org/downloads/raspbian/] and download
 On a fresh and clean Raspberry Pi Debian Jessi light installation goto the directory /opt and clone the repository from github. 
 Login into the Raspberry with the default password "raspberry" and do the following steps:
 
-	sudo -i
+	sudo su - 
 	# do the following steps as user root, you can use the command sudo  
-	sudo apt install git 
+	apt install git 
 	cd /opt
-	sudo git clone https://github.com/dl5rfk/easyBM.git
+	git clone https://github.com/dl5rfk/easyBM.git
 	cd /opt/easyBM/
-	sudo chmod 755 /opt/easyBM/easyBM-install-from-scratch.sh
-	sudo /opt/easyBM/easyBM-install-from-scratch.sh
-	# now follow the description, if everything goes good, you have a ready to use DVMega Hotspot
+	chmod 755 /opt/easyBM/easyBM-install.sh
+	/opt/easyBM/easyBM-install.sh
+	# now follow the description, if everything looks good, you have a ready to use DVMega Hotspot
 
-BUT NOTICE, the script easyBM-install-from-scratch.sh does mostly all the needed steps. Please be carefull, because this install script is still in development. Of course your can help to improve easyBM. 
+BUT NOTICE, the script easyBM-install.sh does mostly all the needed steps. Please be carefull, because this install script is still in development. Of course your can help to improve easyBM. 
 
 ## Additional Informations
 In most parts, easyBM is a collection of software, scripts, programms, so for us it is important, that you have the possibility to get in details.

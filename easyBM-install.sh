@@ -11,7 +11,7 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-#set -x
+set -x
 
 
 # Define Variables
@@ -26,15 +26,15 @@ localipaddr=`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 
 # Define functions
 function pause(){
  echo
- echo -e "\n\n +++ Please, check the printout, now! "
+ echo " +++ Please, check the printout, now! "
+ echo 
  sleep 5
- echo
 }
 
 # Defning return code check function
 check_result() {
     if [ $1 -ne 0 ]; then
-        echo "Error: $2"
+        echo " +++ Error: $2"
         exit $1
     fi
 }
@@ -77,7 +77,7 @@ echo
 echo -e "\n\n +++ We do some checks ...."
 sleep 1
 if [ ! $( id -u ) -eq 0 ]; then
-  echo "  ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
+  echo " +++ ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
 fi
 # Checking root permissions
 if [ "x$(id -u)" != 'x0' ]; then
@@ -85,37 +85,39 @@ if [ "x$(id -u)" != 'x0' ]; then
 fi
 # check directory
 if [ ! -d "/opt/easyBM/" ]; then
-  echo "  ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
+  echo " +++ ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
 fi
 # check apt
 if command -v apt-get &> /dev/null; then
-  echo "  Found.... apt"
+  echo " +++ apt found..."
 else
-  echo "  ERROR:  -apt-  not found !"
+  echo " +++ ERROR: apt not found !"
   exit 0;
 fi 
 # Check easybm user account
 if [ ! -z "$(grep ^easybm: /etc/passwd)" ] && [ -z "$1" ]; then
-    echo "  ERROR: user easybm exists"
-    echo
-    echo 'Please remove easybm user account before proceeding.'
+    echo " +++ ERROR: user easybm exists"
+    echo '     Please remove easybm user account before proceeding.'
     exit 1
 fi
 # Check easybm group account
 if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
-    echo "  ERROR: group easybm exists"
-    echo
-    echo 'Please remove easybm group before proceeding.'
+    echo " +++ ERROR: group easybm exists"
+    echo '     Please remove easybm group before proceeding.'
     exit 1
 fi
+
 # chech interfaces
 availableInterfaces=$(ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1)
- echo "Interface(s) "
+ echo " +++ Interface(s) "
  echo "  ${availableInterfaces}"
  echo "  are up an running"
+
 # Check Internet Access
 ping -c 3 google.com
 check_result $? '  ERROR, please make sure the Internet is reachable !!!'
+echo -e "\n\n +++ Great, we have internet....lets continue...."
+
 # dedect os
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Debian)     ostype="debian" ;;
@@ -123,10 +125,7 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Raspbian)   ostype="raspbian" ;;
     *)          ostype="rhel" ;;
 esac
-echo 
-echo
-echo -e "\n\n +++ Great, we have internet....lets continue...."
-echo
+echo  " +++ ${ostype} detected"
 pause
 
 echo -e "\n\n +++ Update and Upgrade the OS \n"
@@ -135,7 +134,11 @@ check_result $? ' Sorry,..... /usr/bin/apt upgrade failed'
 
 
 echo -e "\n\n +++ Update rpi software \n"
-/usr/bin/sudo /usr/bin/rpi-update
+TEST_URL=$(grep "UPDATE_URI=" /usr/bin/rpi-update | awk -F '=' '{print $2}' | sed -e 's/^"//' -e 's/"$//')
+urlstatus=$(curl -o /dev/null --silent --head --write-out '%{http_code}' ${TEST_URL} )
+if [ ${urlstatus} -eq 200 ]; then
+	/usr/bin/sudo /usr/bin/rpi-update
+fi
 
 echo -e "\n\n +++ installing some Tools...\n"
 # Check wget
@@ -237,6 +240,7 @@ if [ $? -ne 0 ]; then
   echo "  ERROR: /dev/ttyAMA0 NOT FOUND ! "
   echo "  DVMega uses ttyAMA0, think a about it......."
   echo " *********************************************"
+  exit 0;
 else 
   /usr/bin/sudo systemctl stop serial-getty@ttyAMA0.service
   /usr/bin/sudo systemctl disable serial-getty@ttyAMA0.service
@@ -247,12 +251,12 @@ else
   echo " Now, please Check:"
   chmod 1660  /dev/ttyAMA0
   ls -ls /dev/ttyAMA0
+ pause
 fi
 
-pause
 
 if [ ! -d '/opt/rpi-clone' ]; then
-echo -e "\n\n +++ installing rpi-clone\n"
+echo " +++ installing rpi-clone"
  cd /opt/
  git clone https://github.com/billw2/rpi-clone.git
  cd rpi-clone
@@ -262,10 +266,10 @@ pause
 fi
 
 if [ ! -e '/usr/sbin/ntpdate' ]; then
-echo -e "\n\n +++ installing ntpdate\n"
+echo " +++ installing ntpdate"
  /usr/bin/sudo /usr/bin/apt -y install ntpdate 
- echo '#!/bin/sh' > /etc/cron.daily/ntpdate
- echo "$(which ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
+ echo "#!/bin/sh" > /etc/cron.daily/ntpdate
+ echo "$(command -v ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
  chmod 755 /etc/cron.daily/ntpdate
  /usr/bin/sudo $(command -v ntpdate) -s pool.ntp.org
  #/usr/bin/sudo /bin/systemctl enable systemd-timesyncd
@@ -274,21 +278,24 @@ echo -e "\n\n +++ installing ntpdate\n"
 pause
 fi
 
+#RAMDISK
 if [ ! -d '/mnt/ramdisk' ]; then
-  echo -e "\n\n +++ installing ramdisk\n" 
+  echo " +++ installing ramdisk" 
    /usr/bin/sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
-   /bin/grep -q ramdisk /etc/fstab
-  if [ $? -gt 0 ]; then
-    echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=256M 0 0" >> /etc/fstab
-    mount -a
-  else
-    echo -e "\n\n +++ Found ramdisk in fstab, OK. Continue....\n"
-  fi
-pause
+
 fi
 
+if [ -z "$(grep -q ramdisk /etc/fstab)" ]; then
+    echo " +++ Found ramdisk in fstab, OK"
+ else
+    echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=256M 0 0" >> /etc/fstab
+    mount -a
+fi
+pause
+
+#MMDVMCall
 if  [ ! -d '/opt/MMDVMCal' ]; then
- echo -e "\n\n +++ installing MMDVMCal\n"
+ echo " +++ installing MMDVMCal"
  cd /opt
   /usr/bin/sudo git clone https://github.com/g4klx/MMDVMCal.git
  cd /opt/MMDVMCal
@@ -296,8 +303,9 @@ if  [ ! -d '/opt/MMDVMCal' ]; then
  pause
 fi
 
+#MMDVMHost
 if  [ ! -d "/opt/MMDVMHost" ]; then
- echo -e "\n\n +++ installing MMDVMHost\n"
+ echo " +++ installing MMDVMHost"
   cd /opt
    /usr/bin/sudo git clone https://github.com/g4klx/MMDVMHost.git
   cd /opt/MMDVMHost
