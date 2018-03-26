@@ -10,8 +10,9 @@
 # -e option instructs bash to immediately exit if any command [1] has a non-zero exit status
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
-set -e
-set -x
+#set -e
+#set -x
+
 
 
 # Define Variables
@@ -26,7 +27,7 @@ localipaddr=`ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 
 # Define functions
 function pause(){
  echo
- echo " +++ Please, check the printout, now! "
+ echo " # >>>>> Please, check the printout, now! <<<<< "
  echo 
  sleep 5
 }
@@ -34,7 +35,7 @@ function pause(){
 # Defning return code check function
 check_result() {
     if [ $1 -ne 0 ]; then
-        echo " +++ Error: $2"
+        echo " # >>>>> Error: $2 <<<<< "
         exit $1
     fi
 }
@@ -43,6 +44,7 @@ check_result() {
 #START 
 #
 clear
+screenfetch
 echo -e "\e[48;5;220m                                      "
 echo "                                      "
 echo "                       ____  __  __   "
@@ -74,10 +76,10 @@ echo " github.com/dl5rfk/easyBM.git         "
 echo "                                      "
 echo -e "\e[0m                                              "
 echo
-echo -e "\n\n +++ We do some checks ...."
+echo -e "\n\n # >>>>> We do some checks ...."
 sleep 1
 if [ ! $( id -u ) -eq 0 ]; then
-  echo " +++ ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
+  echo " # >>>>> ERROR: $0 Must be run as user root, Script terminating" 1>&2; exit 1; 
 fi
 # Checking root permissions
 if [ "x$(id -u)" != 'x0' ]; then
@@ -85,38 +87,38 @@ if [ "x$(id -u)" != 'x0' ]; then
 fi
 # check directory
 if [ ! -d "/opt/easyBM/" ]; then
-  echo " +++ ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
+  echo " # >>>>> ERROR: $0 need source direcotry /opt/easyBM"; exit 1;
 fi
 # check apt
 if command -v apt-get &> /dev/null; then
-  echo " +++ apt found..."
+  echo " # >>>>> apt found..."
 else
-  echo " +++ ERROR: apt not found !"
+  echo " # >>>>> ERROR: apt not found !"
   exit 0;
 fi 
 # Check easybm user account
 if [ ! -z "$(grep ^easybm: /etc/passwd)" ] && [ -z "$1" ]; then
-    echo " +++ ERROR: user easybm exists"
+    echo " # >>>>> ERROR: user easybm exists"
     echo '     Please remove easybm user account before proceeding.'
     exit 1
 fi
 # Check easybm group account
 if [ ! -z "$(grep ^easybm: /etc/group)" ] && [ -z "$1" ]; then
-    echo " +++ ERROR: group easybm exists"
+    echo " # >>>>> ERROR: group easybm exists"
     echo '     Please remove easybm group before proceeding.'
     exit 1
 fi
 
 # chech interfaces
 availableInterfaces=$(ip --oneline link show up | grep -v "lo" | awk '{print $2}' | cut -d':' -f1 | cut -d'@' -f1)
- echo " +++ Interface(s) "
+ echo " # >>>>> Interface(s) "
  echo "  ${availableInterfaces}"
  echo "  are up an running"
 
 # Check Internet Access
 ping -c 3 google.com
 check_result $? '  ERROR, please make sure the Internet is reachable !!!'
-echo -e "\n\n +++ Great, we have internet....lets continue...."
+echo -e "\n\n # >>>>> Great, we have internet....lets continue...."
 
 # dedect os
 case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
@@ -125,22 +127,22 @@ case $(head -n1 /etc/issue | cut -f 1 -d ' ') in
     Raspbian)   ostype="raspbian" ;;
     *)          ostype="rhel" ;;
 esac
-echo  " +++ ${ostype} detected"
+echo  " # >>>>> ${ostype} detected <<<<< "
 pause
 
-echo -e "\n\n +++ Update and Upgrade the OS \n"
+echo -e "\n\n # >>>>> Update and Upgrade the OS \n"
 /usr/bin/sudo /usr/bin/apt update && /usr/bin/sudo /usr/bin/apt -y upgrade 
 check_result $? ' Sorry,..... /usr/bin/apt upgrade failed'
 
 
-echo -e "\n\n +++ Update rpi software \n"
+echo -e "\n\n # >>>>> Update rpi software \n"
 TEST_URL=$(grep "UPDATE_URI=" /usr/bin/rpi-update | awk -F '=' '{print $2}' | sed -e 's/^"//' -e 's/"$//')
 urlstatus=$(curl -o /dev/null --silent --head --write-out '%{http_code}' ${TEST_URL} )
 if [ ${urlstatus} -eq 200 ]; then
 	/usr/bin/sudo /usr/bin/rpi-update
 fi
 
-echo -e "\n\n +++ installing some Tools...\n"
+echo -e "\n\n # >>>>> installing some Tools...\n"
 # Check wget
 if [ ! $(command -v wget) ]; then
     /usr/bin/apt -y install wget
@@ -206,11 +208,6 @@ if [ ! $(command -v screenfetch) ]; then
     /usr/bin/apt -y install screenfetch
     check_result $? "  Sorry, can't install screenfetch. "
 fi
-# Check nodejs
-if [ ! $(command -v nodejs) ]; then
-    /usr/bin/apt -y install nodejs
-    check_result $? "  Sorry, can't install nodejs. "
-fi
 # Check wicd-curses
 if [ ! $(command -v wicd-curses) ]; then
     /usr/bin/apt -y install wicd-curses
@@ -221,7 +218,7 @@ fi
 
 pause
 
-echo -e "\n\n +++ disabling  bluetooth\n"
+echo -e "\n\n # >>>>> disabling  bluetooth\n"
 # /bin/grep -i -q "dtoverlay=pi3-disable-bt" /boot/config.txt
 # if [[ $? -eq 0 ]]; then
 #   echo "...found, bluetooth is disabled"
@@ -233,7 +230,7 @@ echo -e "\n\n +++ disabling  bluetooth\n"
 
 
 
-echo -e "\n\n +++ checking /dev/ttyAMA0\n"
+echo -e "\n\n # >>>>> checking /dev/ttyAMA0\n"
 ls /dev/ttyAMA0
 if [ $? -ne 0 ]; then
   echo " *********************************************"
@@ -256,7 +253,7 @@ fi
 
 
 if [ ! -d '/opt/rpi-clone' ]; then
-echo " +++ installing rpi-clone"
+echo " # >>>>> installing rpi-clone"
  cd /opt/
  git clone https://github.com/billw2/rpi-clone.git
  cd rpi-clone
@@ -265,13 +262,13 @@ echo " +++ installing rpi-clone"
 pause
 fi
 
-if [ ! -e '/usr/sbin/ntpdate' ]; then
-echo " +++ installing ntpdate"
- /usr/bin/sudo /usr/bin/apt -y install ntpdate 
- echo "#!/bin/sh" > /etc/cron.daily/ntpdate
- echo "$(command -v ntpdate) -s pool.ntp.org" >> /etc/cron.daily/ntpdate
- chmod 755 /etc/cron.daily/ntpdate
- /usr/bin/sudo $(command -v ntpdate) -s pool.ntp.org
+if [ ! -e '/usr/bin/sntp' ]; then
+echo " # >>>>> installing sntp"
+ /usr/bin/sudo /usr/bin/apt -y install sntp 
+ echo "#!/bin/sh" > /etc/cron.daily/sntp
+ echo "$(command -v sntp) -s pool.ntp.org" >> /etc/cron.daily/sntp
+ chmod 755 /etc/cron.daily/sntp
+ /usr/bin/sudo $(command -v sntp) -s pool.ntp.org
  #/usr/bin/sudo /bin/systemctl enable systemd-timesyncd
  #/usr/bin/sudo /bin/systemctl restart systemd-timesyncd
  #/usr/bin/sudo /bin/systemctl status systemd-timesyncd
@@ -280,13 +277,13 @@ fi
 
 #RAMDISK
 if [ ! -d '/mnt/ramdisk' ]; then
-  echo " +++ installing ramdisk" 
+  echo " # >>>>> installing ramdisk" 
    /usr/bin/sudo mkdir /mnt/ramdisk /mnt/pendrive /mnt/diskdrive
 
 fi
 
 if [ -z "$(grep -q ramdisk /etc/fstab)" ]; then
-    echo " +++ Found ramdisk in fstab, OK"
+    echo " # >>>>> Found ramdisk in fstab, OK"
  else
     echo "tmpfs /mnt/ramdisk  tmpfs nodev,nosuid,noexec,nodiratime,size=256M 0 0" >> /etc/fstab
     mount -a
@@ -295,7 +292,7 @@ pause
 
 #MMDVMCall
 if  [ ! -d '/opt/MMDVMCal' ]; then
- echo " +++ installing MMDVMCal"
+ echo " # >>>>> installing MMDVMCal"
  cd /opt
   /usr/bin/sudo git clone https://github.com/g4klx/MMDVMCal.git
  cd /opt/MMDVMCal
@@ -305,7 +302,7 @@ fi
 
 #MMDVMHost
 if  [ ! -d "/opt/MMDVMHost" ]; then
- echo " +++ installing MMDVMHost"
+ echo " # >>>>> installing MMDVMHost"
   cd /opt
    /usr/bin/sudo git clone https://github.com/g4klx/MMDVMHost.git
   cd /opt/MMDVMHost
@@ -313,7 +310,7 @@ if  [ ! -d "/opt/MMDVMHost" ]; then
    /usr/bin/sudo chown -v www-data:www-data /opt/MMDVMHost/MMDVM.ini
    /usr/bin/sudo cp -b -f /opt/MMDVMHost/MMDVM.ini /opt/MMDVMHost/MMDVM.ini.`/bin/date -I`
    /usr/bin/sudo ln -s /opt/MMDVMHost/MMDVM.ini /etc/MMDVM.ini
- echo -e "\n\n +++ installing MMDVMHost systemd Service \n"
+ echo -e "\n\n # >>>>> installing MMDVMHost systemd Service \n"
 echo " 
 [Unit]
 Description=MMDVM Host Service
@@ -332,7 +329,7 @@ WantedBy=multi-user.target
 /usr/bin/sudo chmod 644 /lib/systemd/system/mmdvmhost.service
 /usr/bin/sudo ln -s /lib/systemd/system/mmdvmhost.service /etc/systemd/system/mmdvmhost.service
 
-echo -e "\n\n +++ installing MMDVMHost systemd Timer \n"
+echo -e "\n\n # >>>>> installing MMDVMHost systemd Timer \n"
 echo "
 [Timer]
 OnStartupSec=60
@@ -351,7 +348,7 @@ pause
 fi
 
 if [ ! -d '/opt/YSFClients/']; then 
- echo -e "\n\n +++ installing C4FM YSF Software\n"
+ echo -e "\n\n # >>>>> installing C4FM YSF Software\n"
   cd /opt
    /usr/bin/sudo git clone https://github.com/g4klx/YSFClients.git
   cd /opt/YSFClients/YSFGateway
@@ -379,7 +376,7 @@ if [ ! -d '/opt/YSFClients/']; then
 pause
 fi
 
-echo -e "\n\n +++ installing Webserver lighttpd\n"
+echo -e "\n\n # >>>>> installing Webserver lighttpd\n"
  /usr/bin/sudo /usr/bin/apt -y install lighttpd php-cgi php
  /usr/bin/sudo lighty-enable-mod fastcgi
  /usr/bin/sudo lighty-enable-mod fastcgi-php
@@ -396,23 +393,13 @@ fi
 ## FIXME, checken ob es schon drin steht##
 ## evtl mit sed
 
-
-/bin/grep -q "^www-data" /etc/sudoers
-if [ $? -gt 0 ]; then
+if ! /bin/grep -q "^www-data" /etc/sudoers; then
  echo "www-data ALL=(ALL) NOPASSWD: ALL " >> /etc/sudoers
 else
- echo "UPS, www-data found in /etc/sudoers, so whats next? FIXME"
+ echo " # >>>>> UPS, www-data found in /etc/sudoers, so whats next?"
 fi
 
-
-echo -e "\n\n +++ installing MMDVMHost-Dashboard\n"
- cd /var/www/html/
-  /usr/bin/sudo git clone https://github.com/dg9vh/MMDVMHost-Dashboard.git 
-  /usr/bin/sudo chown -Rv www-data:www-data /var/www/html/MMDVMHost-Dashboard/*
-pause 
-
-
-echo -e "\n\n +++ installing vnstat and vnstati\n"
+echo -e "\n\n # >>>>> installing vnstat and vnstati\n"
 echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
  /usr/bin/sudo /usr/bin/apt -y install vnstat vnstati php5-gd
  /usr/bin/sudo mkdir /var/www/html/vnstati
@@ -420,7 +407,7 @@ echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
 pause
 
 
-echo -e "\n\n +++ setting up the os system\n"
+echo -e "\n\n # >>>>> setting up the os system\n"
 /usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 /usr/bin/sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
 /usr/bin/sudo cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && /usr/bin/sudo chown pi:pi /home/pi/.bash_login
@@ -440,10 +427,10 @@ echo -e "\n\n +++ setting up the os system\n"
 /usr/bin/sudo /bin/sed -i '/rotate/s/[0-9]/2/' /etc/logrotate.conf
 pause 
 
-echo -e "\n\n +++ setting up Firewall\n"
+echo -e "\n\n # >>>>> setting up Firewall\n"
 $(command -v iptables) -C INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 
-echo -e "\n\n +++ prepare for the first use\n"
+echo -e "\n\n # >>>>> prepare for the first use\n"
 /usr/bin/sudo touch /var/www/html/UNCONFIGURED
 echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php'); } else { header('Location:/MMDVMHost-Dashboard/index.php'); } ?>" > /var/www/html/index.php
 /usr/bin/sudo /usr/bin/apt-get -y autoclean
@@ -455,7 +442,7 @@ echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php')
 pause
 
 
-echo -e "\n\n +++ creating your login message\n"
+echo -e "\n\n # >>>>> creating your login message\n"
 echo "
 __________________________________________________________________________
 
@@ -470,7 +457,6 @@ __________________________________________________________________________
 
 " > /etc/motd
 echo 
-screenfetch
 echo
 echo -e "\nCongratulations, you have just successfully installed -easyBM- \n
 \n

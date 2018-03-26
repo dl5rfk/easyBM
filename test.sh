@@ -1,2 +1,0 @@
-#
-# Check easybm group account
