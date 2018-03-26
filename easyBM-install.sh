@@ -411,7 +411,6 @@ echo -e "\n\n # >>>>> setting up the os system\n"
 /usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
 /usr/bin/sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
 /usr/bin/sudo cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && /usr/bin/sudo chown pi:pi /home/pi/.bash_login
-/usr/bin/sudo cp -b -f /opt/easyBM/files/ircddbgateway.default /etc/default/ircddbgateway
 /usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.profile /etc/profile.d/easyBM.sh
 /usr/bin/sudo echo "easybm" > /etc/hostname
 /usr/bin/sudo systemctl enable ssh.service
