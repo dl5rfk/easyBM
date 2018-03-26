@@ -401,20 +401,18 @@ fi
 
 echo -e "\n\n # >>>>> installing vnstat and vnstati\n"
 echo -e "         based on https://j0hn.uk/vnstati/vnstati_howto.php\n"
- /usr/bin/sudo /usr/bin/apt -y install vnstat vnstati php5-gd
+ /usr/bin/sudo /usr/bin/apt -y install vnstat vnstati php-gd
  /usr/bin/sudo mkdir /var/www/html/vnstati
  /usr/bin/sudo wget http://j0hn.uk/vnstati/template.html -O /var/www/html/vnstati/index.html
 pause
 
 
-echo -e "\n\n # >>>>> setting up the os system\n"
-/usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
-/usr/bin/sudo cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
-/usr/bin/sudo cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && /usr/bin/sudo chown pi:pi /home/pi/.bash_login
-/usr/bin/sudo cp -b -f /opt/easyBM/files/easyBM.profile /etc/profile.d/easyBM.sh
+echo -e "\n\n # >>>>> prepare for the first use\n"
+/usr/bin/sudo /bin/cp -b -f /opt/easyBM/files/easyBM.cronjob /etc/cron.d/easyBM
+/usr/bin/sudo /bin/cp -b -f /opt/easyBM/files/99-easyBM.conf /etc/lighttpd/conf-enabled/99-easyBM.conf
+/usr/bin/sudo /bin/cp -b -f /opt/easyBM/files/bash_login /home/pi/.bash_login && /usr/bin/sudo chown pi:pi /home/pi/.bash_login
+/usr/bin/sudo /bin/cp -b -f /opt/easyBM/files/easyBM.profile /etc/profile.d/easyBM.sh
 /usr/bin/sudo echo "easybm" > /etc/hostname
-/usr/bin/sudo systemctl enable ssh.service
-/usr/bin/sudo systemctl start ssh.service
 #edit rsyslog.conf
 /usr/bin/sudo /bin/sed -i '/news/s/^/#/' /etc/rsyslog.conf
 /usr/bin/sudo /bin/sed -i '/mail/s/^/#/' /etc/rsyslog.conf
@@ -424,21 +422,24 @@ echo -e "\n\n # >>>>> setting up the os system\n"
 /usr/bin/sudo /bin/sed -i '/lpr/s/^/#/' /etc/rsyslog.conf
 /usr/bin/sudo /bin/sed -i '/cron/s/^/#/' /etc/rsyslog.conf
 /usr/bin/sudo /bin/sed -i '/rotate/s/[0-9]/2/' /etc/logrotate.conf
+#
+/usr/bin/sudo /usr/bin/apt-get -y autoclean
+/usr/bin/sudo /usr/bin/apt-get -y autoremove
+/usr/bin/sudo /bin/systemctl enable lighttpd
+/usr/bin/sudo /bin/systemctl restart lighttpd
+/usr/bin/sudo /bin/systemctl enable cron
+/usr/bin/sudo /bin/systemctl restart cron
+/usr/bin/sudo /bin/systemctl enable  rsyslog.service
+/usr/bin/sudo /bin/systemctl restart rsyslog.service
+/usr/bin/sudo /bin/systemctl enable ssh.service
+/usr/bin/sudo /bin/systemctl start ssh.service
 pause 
 
 echo -e "\n\n # >>>>> setting up Firewall\n"
 $(command -v iptables) -C INPUT -p tcp -m tcp --dport 80 -j ACCEPT
 
-echo -e "\n\n # >>>>> prepare for the first use\n"
 /usr/bin/sudo touch /var/www/html/UNCONFIGURED
 echo "<?php if (file_exists('UNCONFIGURED')){ header('Location:/admin/init.php'); } else { header('Location:/MMDVMHost-Dashboard/index.php'); } ?>" > /var/www/html/index.php
-/usr/bin/sudo /usr/bin/apt-get -y autoclean
-/usr/bin/sudo /usr/bin/apt-get -y autoremove
-/usr/bin/sudo systemctl restart lighttpd
-/usr/bin/sudo systemctl restart cron
-/usr/bin/sudo systemctl restart rsyslog.service
-
-pause
 
 
 echo -e "\n\n # >>>>> creating your login message\n"
@@ -449,14 +450,13 @@ __________________________________________________________________________
 
   Please do not hesitate to contact us http://easybm.bm262.de 
 
-	Notice: Use the command 'ebm' to start the our service-menu !
-	
 Installation Date: `date -I` 
 __________________________________________________________________________
 
 " > /etc/motd
 echo 
 echo
+clear 
 echo -e "\nCongratulations, you have just successfully installed -easyBM- \n
 \n
   We hope that you enjoy your installation of easyBM.\n
